@@ -19,11 +19,24 @@ rawdata <- rawdata %>% mutate(region = sapply(state, switch,
 )
 rawdata <- mutate(rawdata, react_rate = rawdata$likes / rawdata$views)
 
-#create corpus
-corp <- corpus(rawdata)
-
 #number of collected messages in east, west, federal
 rawdata %>% group_by(region) %>% summarise(n = n(), r = n() / nrow(rawdata))
+
+#distribution of messages in states
+messages_per_state <- rawdata %>%
+    group_by(state) %>%
+    summarise(num = n())
+barplot(height = messages_per_state$num,
+        names = messages_per_state$state,
+        main = "Textkorpus nach Bundesländern",
+        xlab = "Bundesland",
+        ylab = "Nachrichten",
+        ylim = c(0, 50),
+        col = "#8EBBE4"
+)
+
+#create corpus
+corp <- corpus(rawdata)
 
 #calc wordcloud for biggest reaction rates
 corp_sort <- arrange(corp, desc(react_rate))
