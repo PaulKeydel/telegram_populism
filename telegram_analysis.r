@@ -13,10 +13,17 @@ rawdata <- readtext(file = paste0(data_dir, "/telegram_data.tsv"),
                     text_field = "text",
                     docid_field = "creat_time"
 )
+stopifnot(length(unique(rawdata$doc_id)) == nrow(rawdata))
 rawdata <- rawdata %>% mutate(region = sapply(state, switch,
-                              TH = 'ost', 
-                              NRW = 'west', 
-                              Bund = 'bund')
+                              TH = "ost",
+                              SN = "ost",
+                              BB = "ost",
+                              NRW = "west",
+                              BY = "west",
+                              SH = "west",
+                              SL = "west",
+                              RLP = "west",
+                              Bund = "bund")
 )
 rawdata <- mutate(rawdata, react_rate = rawdata$likes / rawdata$views)
 
@@ -32,7 +39,7 @@ barplot(height = messages_per_state$num,
         main = "Textkorpus nach Bundesländern",
         xlab = "Bundesland",
         ylab = "Nachrichten",
-        ylim = c(0, 50),
+        ylim = c(0, 80),
         col = "#8EBBE4"
 )
 
@@ -57,14 +64,26 @@ dfmat <- corp |>
     dfm_group(groups = region)
 topfeatures(dfmat, groups = region, 20)
 set.seed(100)
-textplot_wordcloud(dfm_subset(dfmat, region == "ost"), min_count = 3, random_order = FALSE, rotation = 0.25, color = RColorBrewer::brewer.pal(8, "Dark2"))
+textplot_wordcloud(dfm_subset(dfmat, region == "ost"),
+                   min_count = 4,
+                   max_words = 40,
+                   random_order = FALSE,
+                   rotation = 0.25,
+                   color = RColorBrewer::brewer.pal(8, "Dark2")
+)
 set.seed(100)
-textplot_wordcloud(dfm_subset(dfmat, region == "west"), min_count = 5, random_order = FALSE, rotation = 0.25, color = RColorBrewer::brewer.pal(8, "Dark2"))
+textplot_wordcloud(dfm_subset(dfmat, region == "west"),
+                   min_count = 4,
+                   max_words = 40,
+                   random_order = FALSE,
+                   rotation = 0.25,
+                   color = RColorBrewer::brewer.pal(8, "Dark2")
+)
 
 #show textual context
-kwic(tokens(corp), pattern = "deutsch*", valuetype = "regex")
+head(kwic(tokens(corp), pattern = "deutsch*", valuetype = "regex"))
 
-#determine probability of defined dictionaries
+#determine probability of defined dictionaries and print them in grouped barplots
 dict <- dictionary(list(speech = c("volk", "elit*", "undemokrat*", "betrug", "verrat*", "*lüge*", "wahrheit"),
                         migration = c("migrat*", "ausländer", "grenzen", "abschieben"),
                         names = c("weidel", "chrupalla", "höcke", "krah"))
@@ -77,7 +96,6 @@ dfmat <- corp |>
     dfm_group(groups = region) |>
     dfm_weight(scheme = "prop")
 print(dfmat)
-#print probabilities as barplot in east, west, federal
 text_freq <- textstat_frequency(dfmat, groups = region) %>%
     select(feature, frequency, group) %>%
     spread(key = group, value = frequency)

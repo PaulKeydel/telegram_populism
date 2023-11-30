@@ -5,9 +5,17 @@ import pandas as pd
 import telegram_account as acc
 
 #groups and links
+#Gruppen existieren nicht für ST, HE, BW, MV, NI, HH, HB
+#BE exkludiert, weil Zuordnung Ost-West schwierig
 group_links = [["https://t.me/afdbrennpunkt", "Bund"],
                ["https://t.me/afd_thl", "TH"],
-               ["https://t.me/afdfraktionnrw", "NRW"]]
+               ["https://t.me/afdfraktionnrw", "NRW"],
+               ["https://t.me/afdsachsen", "SN"],
+               ["https://t.me/AfD_Brandenburg", "BB"],
+               ["https://t.me/afdrlp", "RLP"],
+               ["https://t.me/AfDLandtagBayern", "BY"],
+               ["https://t.me/AfDSchleswigHolstein", "SH"],
+               ["https://t.me/afdsaarland", "SL"]]
 
 
 async def get_group_messages(group_names: list, days_back: int, hours_delay = 0) -> list:
@@ -52,7 +60,7 @@ def count_all_reactions(reactions):
 
 def get_sender_of_fwd_msg(forward) -> str:
     if (forward != None):
-        if (forward.chat.username != None):
+        if (forward.chat != None):
             return forward.chat.username
     return ""
 
@@ -80,4 +88,4 @@ for gridx in range(len(group_links)):
             print("msg (" + str(creation_date) + ") added")
 
 df.to_csv('telegram_data.tsv', sep='\t', index=False)
-print(df)
+#print(df)
