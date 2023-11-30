@@ -5,6 +5,7 @@ library("quanteda.tidy")
 library("quanteda.textplots")
 library("quanteda.textstats")
 library("dplyr")
+library("tidyr")
 
 #load data.frame from file and add variables
 data_dir <- "/Users/paulkeydel/Documents/coding projects/telegram"
@@ -48,13 +49,17 @@ dfmat <- corp_sort[1:10] |>
 set.seed(100)
 textplot_wordcloud(dfmat, min_count = 3, random_order = FALSE, rotation = 0.25, color = RColorBrewer::brewer.pal(8, "Dark2"))
 
-#topfeatures between east, west, federal
+#topfeatures and wordclouds between east, west, federal
 dfmat <- corp |>
     tokens(remove_punct = TRUE, remove_symbols = TRUE) |>
     dfm(tolower = TRUE) |>
     dfm_remove(pattern = stopwords("german")) |>
     dfm_group(groups = region)
 topfeatures(dfmat, groups = region, 20)
+set.seed(100)
+textplot_wordcloud(dfm_subset(dfmat, region == "ost"), min_count = 3, random_order = FALSE, rotation = 0.25, color = RColorBrewer::brewer.pal(8, "Dark2"))
+set.seed(100)
+textplot_wordcloud(dfm_subset(dfmat, region == "west"), min_count = 5, random_order = FALSE, rotation = 0.25, color = RColorBrewer::brewer.pal(8, "Dark2"))
 
 #show textual context
 kwic(tokens(corp), pattern = "deutsch*", valuetype = "regex")
@@ -72,3 +77,16 @@ dfmat <- corp |>
     dfm_group(groups = region) |>
     dfm_weight(scheme = "prop")
 print(dfmat)
+#print probabilities as barplot in east, west, federal
+text_freq <- textstat_frequency(dfmat, groups = region) %>%
+    select(feature, frequency, group) %>%
+    spread(key = group, value = frequency)
+t <- as.matrix(select(text_freq, bund, ost, west))
+colnames(t) <- c("Bund", "Ost", "West")
+rownames(t) <- text_freq$feature
+t
+barplot(t,
+    col = c("lightblue", "#bae4ba", "red"),
+    legend.text = text_freq$feature,
+    ylim = c(0, 1),
+    beside = TRUE)
