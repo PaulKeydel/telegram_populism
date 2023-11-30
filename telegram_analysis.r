@@ -43,8 +43,9 @@ barplot(height = messages_per_state$num,
         col = "#8EBBE4"
 )
 
-#create corpus
+#create corpus and the corpus that is tokenized
 corp <- corpus(rawdata)
+corp_tkns <- corp |> tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE)
 
 #calc wordcloud for biggest reaction rates
 corp_sort <- arrange(corp, desc(react_rate))
@@ -57,8 +58,7 @@ set.seed(100)
 textplot_wordcloud(dfmat, min_count = 3, random_order = FALSE, rotation = 0.25, color = RColorBrewer::brewer.pal(8, "Dark2"))
 
 #topfeatures and wordclouds between east, west, federal
-dfmat <- corp |>
-    tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
+dfmat <- corp_tkns |>
     dfm(tolower = TRUE) |>
     dfm_remove(pattern = stopwords("german"))
 topfeatures(dfmat, groups = region, 20)
@@ -83,18 +83,19 @@ textplot_wordcloud(dfm_subset(dfmat, region == "west"),
 head(kwic(tokens(corp), pattern = "deutsch*", valuetype = "regex"))
 
 #determine probability of defined dictionaries and print them in grouped barplots
+#sources dictionaries:
+#Matthijs Rooduijn & Teun Pauwels: Measuring Populism
+#RPC-Lex: https://osf.io/s48cj/?view_only=
 dict <- dictionary(list(ideology = c("volk", "elit*", "undemokrat*", "referend*", "betrug", "verrat*", "*lüge*", "wahrheit", "establishm*", "*herrsch*", "politiker*"),
                         movement = c("weidel", "chrupalla", "höcke", "storch", "gauland", "zusammen", "gemeinsam", "protest", "mehrheit", "jagen", "gegenbewegung"))
 )
-#sources dictionaries:
-#Matthijs Rooduijn & Teun Pauwels: Measuring Populism
-#RCP-Lex: https://osf.io/s48cj/?view_only=
-dfmat <- corp |>
-    tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
+dfmat_0 <- corp_tkns |>
     tokens_lookup(dictionary = dict) |>
     dfm(tolower = TRUE) |>
-    dfm_remove(pattern = stopwords("german")) |>
-    dfm_group(groups = region) |>
+    dfm_remove(pattern = stopwords("german"))
+par(mfrow = c(1, 2))
+#group the feature matrix by c(ost, west, bund)
+dfmat <- dfmat_0 |> dfm_group(groups = region) |>
     dfm_weight(scheme = "prop")
 print(dfmat)
 text_freq <- textstat_frequency(dfmat, groups = region) %>%
@@ -103,7 +104,20 @@ text_freq <- textstat_frequency(dfmat, groups = region) %>%
 t <- as.matrix(select(text_freq, bund, ost, west))
 colnames(t) <- c("Bund", "Ost", "West")
 rownames(t) <- text_freq$feature
-t
+barplot(t,
+    col = c("lightblue", "#bae4ba"),
+    legend.text = text_freq$feature,
+    ylim = c(0, 1),
+    beside = TRUE)
+#group the feature matrix by states
+dfmat <- dfmat_0 |> dfm_group(groups = state) |>
+    dfm_weight(scheme = "prop")
+print(dfmat)
+text_freq <- textstat_frequency(dfmat, groups = state) %>%
+    select(feature, frequency, group) %>%
+    spread(key = group, value = frequency)
+t <- as.matrix(select(text_freq, -feature, -Bund))
+rownames(t) <- text_freq$feature
 barplot(t,
     col = c("lightblue", "#bae4ba"),
     legend.text = text_freq$feature,
