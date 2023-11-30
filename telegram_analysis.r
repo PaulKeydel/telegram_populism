@@ -83,10 +83,12 @@ textplot_wordcloud(dfm_subset(dfmat, region == "west"),
 head(kwic(tokens(corp), pattern = "deutsch*", valuetype = "regex"))
 
 #determine probability of defined dictionaries and print them in grouped barplots
-dict <- dictionary(list(speech = c("volk", "elit*", "undemokrat*", "betrug", "verrat*", "*lüge*", "wahrheit"),
-                        migration = c("migrat*", "ausländer", "grenzen", "abschieben"),
-                        names = c("weidel", "chrupalla", "höcke", "krah"))
+dict <- dictionary(list(ideology = c("volk", "elit*", "undemokrat*", "referend*", "betrug", "verrat*", "*lüge*", "wahrheit", "establishm*", "*herrsch*", "politiker*"),
+                        movement = c("weidel", "chrupalla", "höcke", "storch", "gauland", "zusammen", "gemeinsam", "protest", "mehrheit", "jagen", "gegenbewegung"))
 )
+#sources dictionaries:
+#Matthijs Rooduijn & Teun Pauwels: Measuring Populism
+#RCP-Lex: https://osf.io/s48cj/?view_only=
 dfmat <- corp |>
     tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
     tokens_lookup(dictionary = dict) |>
@@ -103,7 +105,7 @@ colnames(t) <- c("Bund", "Ost", "West")
 rownames(t) <- text_freq$feature
 t
 barplot(t,
-    col = c("lightblue", "#bae4ba", "red"),
+    col = c("lightblue", "#bae4ba"),
     legend.text = text_freq$feature,
     ylim = c(0, 1),
     beside = TRUE)
