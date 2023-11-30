@@ -50,7 +50,7 @@ corp <- corpus(rawdata)
 corp_sort <- arrange(corp, desc(react_rate))
 summary(corp_sort)
 dfmat <- corp_sort[1:10] |>
-    tokens(remove_punct = TRUE, remove_symbols = TRUE) |>
+    tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
     dfm(tolower = TRUE) |>
     dfm_remove(pattern = stopwords("german"))
 set.seed(100)
@@ -58,10 +58,9 @@ textplot_wordcloud(dfmat, min_count = 3, random_order = FALSE, rotation = 0.25, 
 
 #topfeatures and wordclouds between east, west, federal
 dfmat <- corp |>
-    tokens(remove_punct = TRUE, remove_symbols = TRUE) |>
+    tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
     dfm(tolower = TRUE) |>
-    dfm_remove(pattern = stopwords("german")) |>
-    dfm_group(groups = region)
+    dfm_remove(pattern = stopwords("german"))
 topfeatures(dfmat, groups = region, 20)
 set.seed(100)
 textplot_wordcloud(dfm_subset(dfmat, region == "ost"),
@@ -89,7 +88,7 @@ dict <- dictionary(list(speech = c("volk", "elit*", "undemokrat*", "betrug", "ve
                         names = c("weidel", "chrupalla", "höcke", "krah"))
 )
 dfmat <- corp |>
-    tokens(remove_punct = TRUE, remove_symbols = TRUE) |>
+    tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
     tokens_lookup(dictionary = dict) |>
     dfm(tolower = TRUE) |>
     dfm_remove(pattern = stopwords("german")) |>
