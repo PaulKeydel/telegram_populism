@@ -32,7 +32,7 @@ rawdata <- mutate(rawdata, react_rate = rawdata$likes / rawdata$views)
 rpc_dict_df <- read_delim(paste0(data_dir, "/rpc_lex.csv"),
                           delim = ";", locale = locale(decimal_mark = ",")
 )
-unique(rpc_dict_df$category_de)
+unique(rpc_dict_df$category_en)
 dict_protest <- unlist(rpc_dict_df %>%
     filter(category_en == "Protest/rebellion") %>%
     select(term))
@@ -42,10 +42,19 @@ dict_nationalism <- unlist(rpc_dict_df %>%
 dict_antielitism <- unlist(rpc_dict_df %>%
     filter(category_en == "Anti-elitism") %>%
     select(term))
-#base::intersect(base::setdiff(dict_movement, dict_nationalism),dict_antielitism)
-#base::intersect(base::setdiff(dict_nationalism, dict_movement),dict_antielitism)
-dict_movement <- base::intersect(dict_protest, dict_antielitism)
-dict_ideology <- base::intersect(dict_nationalism, dict_antielitism)
+dict_antiimmigrant <- unlist(rpc_dict_df %>%
+    filter(category_en == "Anti-immigration/islamophobia") %>%
+    select(term))
+dict_conspiracy <- unlist(rpc_dict_df %>%
+    filter(category_en == "Conspiracy") %>%
+    select(term))
+dict_movement <- base::setdiff(dict_protest, dict_conspiracy)
+dict_ideology <- base::setdiff(base::setdiff(dict_nationalism, dict_antiimmigrant), dict_conspiracy)
+#dict_movement <- base::intersect(dict_protest, dict_antielitism)
+#dict_ideology <- base::intersect(dict_nationalism, dict_antielitism)
+intrsct <- base::intersect(dict_movement, dict_ideology)
+dict_movement <- base::setdiff(dict_movement, intrsct)
+dict_ideology <- base::setdiff(dict_ideology, intrsct)
 rpc_dict_df <- data.frame(word = c(dict_movement, dict_ideology),
                           sentiment = c(rep("movement", length(dict_movement)), rep("ideology", length(dict_ideology))))
 rpc_dict <- as.dictionary(rpc_dict_df, tolower = TRUE)
