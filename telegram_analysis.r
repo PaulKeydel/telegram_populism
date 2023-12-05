@@ -33,22 +33,21 @@ rpc_dict_df <- read_delim(paste0(data_dir, "/rpc_lex.csv"),
                           delim = ";", locale = locale(decimal_mark = ",")
 )
 unique(rpc_dict_df$category_de)
-dict1_df <- rpc_dict_df %>%
-    filter(category_en == "Protest/rebellion" | category_en == "Anti-elitism") %>%
-    group_by(term) %>%
-    summarise(n = n()) %>%
-    filter(n > 1) %>%
-    select(term) %>%
-    mutate(cat = "movement")
-dict2_df <- rpc_dict_df %>%
-    filter(category_en == "Nationalism" | category_en == "Anti-elitism") %>%
-    group_by(term) %>%
-    summarise(n = n()) %>%
-    filter(n > 1) %>%
-    select(term) %>%
-    mutate(cat = "ideology")
-rpc_dict_df <- data.frame(word = rbind(dict1_df, dict2_df)$term,
-                          sentiment = rbind(dict1_df, dict2_df)$cat)
+dict_protest <- unlist(rpc_dict_df %>%
+    filter(category_en == "Protest/rebellion") %>%
+    select(term))
+dict_nationalism <- unlist(rpc_dict_df %>%
+    filter(category_en == "Nationalism") %>%
+    select(term))
+dict_antielitism <- unlist(rpc_dict_df %>%
+    filter(category_en == "Anti-elitism") %>%
+    select(term))
+#base::intersect(base::setdiff(dict_movement, dict_nationalism),dict_antielitism)
+#base::intersect(base::setdiff(dict_nationalism, dict_movement),dict_antielitism)
+dict_movement <- base::intersect(dict_protest, dict_antielitism)
+dict_ideology <- base::intersect(dict_nationalism, dict_antielitism)
+rpc_dict_df <- data.frame(word = c(dict_movement, dict_ideology),
+                          sentiment = c(rep("movement", length(dict_movement)), rep("ideology", length(dict_ideology))))
 rpc_dict <- as.dictionary(rpc_dict_df, tolower = TRUE)
 
 #number of collected messages in east, west, federal
