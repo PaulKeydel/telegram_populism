@@ -6,6 +6,7 @@ library("quanteda.textplots")
 library("quanteda.textstats")
 library("dplyr")
 library("tidyr")
+library("readr")
 
 #load data.frame from file and add variables
 data_dir <- "/Users/paulkeydel/Documents/coding projects/telegram"
@@ -26,6 +27,29 @@ rawdata <- rawdata %>% mutate(region = sapply(state, switch,
                               Bund = "bund")
 )
 rawdata <- mutate(rawdata, react_rate = rawdata$likes / rawdata$views)
+
+#load RPC dictionary
+rpc_dict_df <- read_delim(paste0(data_dir, "/rpc_lex.csv"),
+                          delim = ";", locale = locale(decimal_mark = ",")
+)
+unique(rpc_dict_df$category_de)
+dict1_df <- rpc_dict_df %>%
+    filter(category_en == "Protest/rebellion" | category_en == "Anti-elitism") %>%
+    group_by(term) %>%
+    summarise(n = n()) %>%
+    filter(n > 1) %>%
+    select(term) %>%
+    mutate(cat = "movement")
+dict2_df <- rpc_dict_df %>%
+    filter(category_en == "Nationalism" | category_en == "Anti-elitism") %>%
+    group_by(term) %>%
+    summarise(n = n()) %>%
+    filter(n > 1) %>%
+    select(term) %>%
+    mutate(cat = "ideology")
+rpc_dict_df <- data.frame(word = rbind(dict1_df, dict2_df)$term,
+                          sentiment = rbind(dict1_df, dict2_df)$cat)
+rpc_dict <- as.dictionary(rpc_dict_df, tolower = TRUE)
 
 #number of collected messages in east, west, federal
 rawdata %>% group_by(region) %>% summarise(n = n(), r = n() / nrow(rawdata))
@@ -89,6 +113,7 @@ head(kwic(tokens(corp), pattern = "deutsch*", valuetype = "regex"))
 dict <- dictionary(list(ideology = c("volk", "elit*", "undemokrat*", "referend*", "betrug", "verrat*", "*lüge*", "wahrheit", "establishm*", "*herrsch*", "politiker*"),
                         movement = c("weidel", "chrupalla", "höcke", "storch", "gauland", "zusammen", "gemeinsam", "protest", "mehrheit", "jagen", "gegenbewegung"))
 )
+dict <- rpc_dict
 dfmat_0 <- corp_tkns |>
     tokens_lookup(dictionary = dict) |>
     dfm(tolower = TRUE) |>
