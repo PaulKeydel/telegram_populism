@@ -28,6 +28,14 @@ rawdata <- rawdata %>% mutate(region = sapply(state, switch,
 )
 rawdata <- mutate(rawdata, react_rate = rawdata$likes / rawdata$views)
 
+#load and construct dictionaries
+#for analysis we use two different dicts from
+#*Matthijs Rooduijn & Teun Pauwels: Measuring Populism
+#*RPC-Lex: https://osf.io/s48cj/?view_only=
+dict_RTideo <- unlist(c(
+    "elit*", "konsens*", "undemokrat*", "referend*", "korrupt*", "propagand*", "politiker*", "täusch*", "betrug*", "betrüg*", "*verrat*", "scham*", "schäm*", "skandal*", "wahrheit*", "unfair*", "establishm*", "*herrsch*", "unehrlich*")
+)
+rooduijn_dict <- dictionary(list(ideology_RT = dict_RTideo))
 #load RPC dictionary
 rpc_dict_df <- read_delim(paste0(data_dir, "/rpc_lex.csv"),
                           delim = ";", locale = locale(decimal_mark = ",")
@@ -49,7 +57,7 @@ dict_conspiracy <- unlist(rpc_dict_df %>%
     filter(category_en == "Conspiracy") %>%
     select(term))
 dict_movement <- base::setdiff(dict_protest, dict_conspiracy)
-dict_ideology <- base::setdiff(base::setdiff(dict_nationalism, dict_antiimmigrant), dict_conspiracy)
+dict_ideology <- base::union(base::setdiff(dict_nationalism, dict_antiimmigrant), dict_RTideo)
 #dict_movement <- base::intersect(dict_protest, dict_antielitism)
 #dict_ideology <- base::intersect(dict_nationalism, dict_antielitism)
 intrsct <- base::intersect(dict_movement, dict_ideology)
@@ -115,13 +123,8 @@ textplot_wordcloud(dfm_subset(dfmat, region == "west"),
 head(kwic(tokens(corp), pattern = "deutsch*", valuetype = "regex"))
 
 #determine probability of defined dictionaries and print them in grouped barplots
-#sources dictionaries:
-#Matthijs Rooduijn & Teun Pauwels: Measuring Populism
-#RPC-Lex: https://osf.io/s48cj/?view_only=
-dict <- dictionary(list(ideology = c("volk", "elit*", "undemokrat*", "referend*", "betrug", "verrat*", "*lüge*", "wahrheit", "establishm*", "*herrsch*", "politiker*"),
-                        movement = c("weidel", "chrupalla", "höcke", "storch", "gauland", "zusammen", "gemeinsam", "protest", "mehrheit", "jagen", "gegenbewegung"))
-)
 dict <- rpc_dict
+#dict <- c(rpc_dict["movement"], rooduijn_dict["ideology_RT"])
 dfmat_0 <- corp_tkns |>
     tokens_lookup(dictionary = dict) |>
     dfm(tolower = TRUE) |>
