@@ -8,9 +8,9 @@ library("dplyr")
 library("tidyr")
 library("readr")
 
-#load data.frame from file and add variables
-data_dir <- "/Users/paulkeydel/Documents/coding projects/telegram"
-rawdata <- readtext(file = paste0(data_dir, "/telegram_data.tsv"),
+#load main data.frame, add variables and load texts for dict validation
+data_dir <- "/Users/paulkeydel/Documents/coding projects/telegram/"
+rawdata <- readtext(file = paste0(data_dir, "telegram_data.tsv"),
                     text_field = "text",
                     docid_field = "creat_time"
 )
@@ -27,9 +27,17 @@ rawdata <- rawdata %>% mutate(region = sapply(state, switch,
                               Bund = "bund")
 )
 rawdata <- mutate(rawdata, react_rate = rawdata$likes / rawdata$views)
+rawIB <- readtext(file = paste0(data_dir, "IB_selbstverstaendnis.tsv"),
+                  text_field = "text",
+                  docid_field = "title"
+)
+rawAfD <- readtext(file = paste0(data_dir, "afd_wahlprogramm.tsv"),
+                   text_field = "text",
+                   docid_field = "title"
+)
 
-#load and construct dictionaries
-#for analysis we use two different dicts from
+#load dictionaries from literature
+#for building our own dicts we use two different dicts from
 #*Matthijs Rooduijn & Teun Pauwels: Measuring Populism
 #*RPC-Lex: https://osf.io/s48cj/?view_only=
 dict_RTideo <- unlist(c(
@@ -41,31 +49,40 @@ rpc_dict_df <- read_delim(paste0(data_dir, "/rpc_lex.csv"),
                           delim = ";", locale = locale(decimal_mark = ",")
 )
 unique(rpc_dict_df$category_en)
-dict_protest <- unlist(rpc_dict_df %>%
-    filter(category_en == "Protest/rebellion") %>%
-    select(term))
-dict_nationalism <- unlist(rpc_dict_df %>%
-    filter(category_en == "Nationalism") %>%
-    select(term))
-dict_antielitism <- unlist(rpc_dict_df %>%
-    filter(category_en == "Anti-elitism") %>%
-    select(term))
-dict_antiimmigrant <- unlist(rpc_dict_df %>%
-    filter(category_en == "Anti-immigration/islamophobia") %>%
-    select(term))
-dict_conspiracy <- unlist(rpc_dict_df %>%
-    filter(category_en == "Conspiracy") %>%
-    select(term))
-dict_movement <- base::setdiff(dict_protest, dict_conspiracy)
-dict_ideology <- base::union(base::setdiff(dict_nationalism, dict_antiimmigrant), dict_RTideo)
-#dict_movement <- base::intersect(dict_protest, dict_antielitism)
-#dict_ideology <- base::intersect(dict_nationalism, dict_antielitism)
-intrsct <- base::intersect(dict_movement, dict_ideology)
-dict_movement <- base::setdiff(dict_movement, intrsct)
-dict_ideology <- base::setdiff(dict_ideology, intrsct)
-rpc_dict_df <- data.frame(word = c(dict_movement, dict_ideology),
-                          sentiment = c(rep("movement", length(dict_movement)), rep("ideology", length(dict_ideology))))
+rpc_dict_df <- select(rpc_dict_df, term, category_en)
+colnames(rpc_dict_df) <- c("word", "sentiment")
 rpc_dict <- as.dictionary(rpc_dict_df, tolower = TRUE)
+
+#construct the dictionaries for type detection by analyzing all RPC subdicts first
+corp_IB <- corpus(rawIB)
+dfm_IB <- corp_IB |>
+    tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
+    tokens_lookup(dictionary = rpc_dict) |>
+    dfm(tolower = TRUE) |>
+    dfm_remove(pattern = stopwords("german"))
+corp_afd <- corpus(rawAfD)
+dfm_afd <- corp_afd |>
+    tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
+    tokens_lookup(dictionary = rpc_dict) |>
+    dfm(tolower = TRUE) |>
+    dfm_remove(pattern = stopwords("german"))
+textstat_frequency(dfm_IB)
+textstat_frequency(dfm_afd)
+
+#select and combine features to obtain the dict for detecting populism types
+dict_protest <- unlist(filter(rpc_dict_df, sentiment == "Protest/rebellion")["word"])
+dict_nationalism <- unlist(filter(rpc_dict_df, sentiment == "Nationalism")["word"])
+dict_antielitism <- unlist(filter(rpc_dict_df, sentiment == "Anti-elitism")["word"])
+dict_antiimmigrant <- unlist(filter(rpc_dict_df, sentiment == "Anti-immigration/islamophobia")["word"])
+dict_conspiracy <- unlist(filter(rpc_dict_df, sentiment == "Conspiracy")["word"])
+dict_movement <- base::intersect(dict_protest, dict_antielitism)
+dict_ideology <- base::intersect(dict_nationalism, dict_antielitism)
+#intrsct <- base::intersect(dict_movement, dict_ideology)
+#dict_movement <- base::setdiff(dict_movement, intrsct)
+#dict_ideology <- base::setdiff(dict_ideology, intrsct)
+poptype_dict_df <- data.frame(word = c(dict_movement, dict_ideology),
+                          sentiment = c(rep("movement", length(dict_movement)), rep("ideology", length(dict_ideology))))
+poptype_dict <- as.dictionary(poptype_dict_df, tolower = TRUE)
 
 #number of collected messages in east, west, federal
 rawdata %>% group_by(region) %>% summarise(n = n(), r = n() / nrow(rawdata))
@@ -119,14 +136,9 @@ textplot_wordcloud(dfm_subset(dfmat, region == "west"),
                    color = RColorBrewer::brewer.pal(8, "Dark2")
 )
 
-#show textual context
-head(kwic(tokens(corp), pattern = "deutsch*", valuetype = "regex"))
-
 #determine probability of defined dictionaries and print them in grouped barplots
-dict <- rpc_dict
-#dict <- c(rpc_dict["movement"], rooduijn_dict["ideology_RT"])
 dfmat_0 <- corp_tkns |>
-    tokens_lookup(dictionary = dict) |>
+    tokens_lookup(dictionary = poptype_dict) |>
     dfm(tolower = TRUE) |>
     dfm_remove(pattern = stopwords("german"))
 par(mfrow = c(1, 2))
