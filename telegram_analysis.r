@@ -55,12 +55,12 @@ rpc_dict <- as.dictionary(rpc_dict_df, tolower = TRUE)
 
 #construct the dictionaries for type detection by analyzing all RPC subdicts first
 corp_IB <- corpus(rawIB)
+corp_afd <- corpus(rawAfD)
 dfm_IB <- corp_IB |>
     tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
     tokens_lookup(dictionary = rpc_dict) |>
     dfm(tolower = TRUE) |>
     dfm_remove(pattern = stopwords("german"))
-corp_afd <- corpus(rawAfD)
 dfm_afd <- corp_afd |>
     tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
     tokens_lookup(dictionary = rpc_dict) |>
@@ -75,14 +75,28 @@ dict_nationalism <- unlist(filter(rpc_dict_df, sentiment == "Nationalism")["word
 dict_antielitism <- unlist(filter(rpc_dict_df, sentiment == "Anti-elitism")["word"])
 dict_antiimmigrant <- unlist(filter(rpc_dict_df, sentiment == "Anti-immigration/islamophobia")["word"])
 dict_conspiracy <- unlist(filter(rpc_dict_df, sentiment == "Conspiracy")["word"])
-dict_movement <- base::intersect(dict_protest, dict_antielitism)
-dict_ideology <- base::intersect(dict_nationalism, dict_antielitism)
+#dict_movement <- base::intersect(dict_protest, dict_antielitism)
+#dict_ideology <- base::intersect(dict_conspiracy, dict_antielitism)
+dict_movement <- base::setdiff(dict_protest, dict_conspiracy)
+dict_ideology <- base::setdiff(dict_conspiracy, dict_protest)
 #intrsct <- base::intersect(dict_movement, dict_ideology)
 #dict_movement <- base::setdiff(dict_movement, intrsct)
 #dict_ideology <- base::setdiff(dict_ideology, intrsct)
 poptype_dict_df <- data.frame(word = c(dict_movement, dict_ideology),
                           sentiment = c(rep("movement", length(dict_movement)), rep("ideology", length(dict_ideology))))
 poptype_dict <- as.dictionary(poptype_dict_df, tolower = TRUE)
+dfm_IB <- corp_IB |>
+    tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
+    tokens_lookup(dictionary = poptype_dict) |>
+    dfm(tolower = TRUE) |>
+    dfm_remove(pattern = stopwords("german"))
+dfm_afd <- corp_afd |>
+    tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
+    tokens_lookup(dictionary = poptype_dict) |>
+    dfm(tolower = TRUE) |>
+    dfm_remove(pattern = stopwords("german"))
+textstat_frequency(dfm_IB)
+textstat_frequency(dfm_afd)
 
 #number of collected messages in east, west, federal
 rawdata %>% group_by(region) %>% summarise(n = n(), r = n() / nrow(rawdata))
