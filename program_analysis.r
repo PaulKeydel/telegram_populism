@@ -12,12 +12,12 @@ library("readr")
 data_dir <- "/Users/paulkeydel/Documents/coding projects/telegram/"
 
 #load main data.frame, add variables and load texts for dict validation
-rawdata <- readtext(file = paste0(data_dir, "telegram_data.tsv"),
-                    text_field = "text",
-                    docid_field = "creat_time"
+rawdata <- readtext(file = paste0(data_dir, "afd_wahlprogramm.tsv"),
+                    docid_field = "state",
+                    text_field = "text"
 )
 stopifnot(length(unique(rawdata$doc_id)) == nrow(rawdata))
-rawdata <- rawdata %>% mutate(region = sapply(state, switch,
+rawdata <- rawdata %>% mutate(region = sapply(doc_id, switch,
                               TH = "ost",
                               SN = "ost",
                               BB = "ost",
@@ -28,7 +28,6 @@ rawdata <- rawdata %>% mutate(region = sapply(state, switch,
                               RLP = "west",
                               Bund = "bund")
 )
-rawdata <- mutate(rawdata, react_rate = rawdata$likes / rawdata$views)
 
 
 #load right-wing dictionariy from literature
@@ -142,10 +141,10 @@ barplot(t,
     ylim = c(0, 1),
     beside = TRUE)
 #group the feature matrix by states
-dfmat <- dfmat_0 |> dfm_group(groups = state) |>
+dfmat <- dfmat_0 |>
     dfm_weight(scheme = "prop")
 print(dfmat)
-text_freq <- textstat_frequency(dfmat, groups = state) %>%
+text_freq <- textstat_frequency(dfmat) %>%
     select(feature, frequency, group) %>%
     spread(key = group, value = frequency)
 t <- as.matrix(select(text_freq, -feature, -Bund))
