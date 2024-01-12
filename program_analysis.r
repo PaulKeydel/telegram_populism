@@ -20,13 +20,19 @@ stopifnot(length(unique(rawdata$doc_id)) == nrow(rawdata))
 rawdata <- rawdata %>% mutate(region = sapply(doc_id, switch,
                               TH = "ost",
                               SN = "ost",
+                              ST = "ost",
                               BB = "ost",
+                              MV = "ost",
                               NRW = "west",
                               BY = "west",
                               SH = "west",
                               SL = "west",
                               RLP = "west",
-                              Bund = "bund")
+                              BW = "west",
+                              HE = "west",
+                              NI = "west",
+                              HH = "west",
+                              HB = "west")
 )
 
 
@@ -81,6 +87,7 @@ wordcloud_east_west <- function(max_words) {
                     rotation = 0.25,
                     color = RColorBrewer::brewer.pal(8, "Dark2")
     )
+    title(main = "manifestos: significant words in East Germany")
     set.seed(100)
     textplot_wordcloud(dfm_subset(dfmat, region == "west"),
                     min_count = 4,
@@ -89,6 +96,7 @@ wordcloud_east_west <- function(max_words) {
                     rotation = 0.25,
                     color = RColorBrewer::brewer.pal(8, "Dark2")
     )
+    title(main = "manifestos: significant words in West Germany")
 }
 
 #determine probability of defined dictionaries and print them in grouped barplots
@@ -99,29 +107,32 @@ plot_prob_defined_subdicts <- function() {
         dfm_remove(pattern = stopwords("german"))
     #par(mfrow = c(1, 2))
     #group the feature matrix by c(ost, west, bund)
-    dfmat <- dfmat_0 |> dfm_group(groups = region) |>
+    dfmat <- dfm_group(dfmat_0, groups = region) |>
         dfm_weight(scheme = "prop")
     #print(dfmat)
     text_freq <- textstat_frequency(dfmat, groups = region) %>%
         select(feature, frequency, group) %>%
         spread(key = group, value = frequency)
     t <- as.matrix(select(text_freq, ost, west))
-    colnames(t) <- c("Ost", "West")
+    colnames(t) <- c("East", "West")
     rownames(t) <- text_freq$feature
     barplot(t,
         #col = c("lightblue", "#bae4ba"),
         legend.text = text_freq$feature,
         ylim = c(0, 1),
-        main = "election programmes",
-        beside = TRUE)
+        main = "manifestos: dictionary performed by East-West division",
+        beside = TRUE
+    )
     #group the feature matrix by states
     dfmat <- dfmat_0 |> dfm_weight(scheme = "prop")
+    docnames(dfmat) <- paste(docnames(dfmat), dfmat$year %% 100)
     barplot(t(convert(dfmat, to = "matrix")),
         #col = c("lightblue", "#bae4ba"),
         legend.text = text_freq$feature,
         ylim = c(0, 1),
-        main = "election programmes",
-        beside = TRUE)
+        main = "manifestos: dictionary performed by state",
+        beside = TRUE
+    )
 }
 
 

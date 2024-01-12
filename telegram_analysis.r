@@ -62,7 +62,7 @@ rpc_dict_df <- read_delim(paste0(data_dir, "/rpc_lex.csv"),
 rpc_dict_df <- select(rpc_dict_df, term, category_en)
 rpc_dict_df <- filter(rpc_dict_df, category_en %in% selected_subdicts)
 colnames(rpc_dict_df) <- c("word", "sentiment")
-rpc_dict <- as.dictionary(rpc_dict_df, tolower = TRUE)
+rpc_dict <<- as.dictionary(rpc_dict_df, tolower = TRUE)
 
 #create corpus and the corpus that is tokenized
 corp <<- corpus(rawdata)
@@ -75,9 +75,9 @@ plot_msgs_state_dist <- function() {
         summarise(num = n())
     barplot(height = messages_per_state$num,
             names = messages_per_state$state,
-            main = "Textkorpus nach Bundesländern",
-            xlab = "Bundesland",
-            ylab = "Nachrichten",
+            main = "Telegram: text corpus by state",
+            xlab = "federate state/Bundesland",
+            ylab = "messages",
             ylim = c(0, 50 + max(messages_per_state$num)),
             col = "#8EBBE4"
     )
@@ -92,7 +92,14 @@ wordcloud_react_rate <- function(max_words) {
         dfm(tolower = TRUE) |>
         dfm_remove(pattern = stopwords("german"))
     set.seed(100)
-    textplot_wordcloud(dfmat, min_count = 3, max_words = max_words, random_order = FALSE, rotation = 0.25, color = RColorBrewer::brewer.pal(8, "Dark2"))
+    textplot_wordcloud(dfmat,
+                    min_count = 3,
+                    max_words = max_words,
+                    random_order = FALSE,
+                    rotation = 0.25,
+                    color = RColorBrewer::brewer.pal(8, "Dark2")
+    )
+    title(main = "Telegram: wordcloud of highest feedbacked messages")
 }
 
 #wordclouds between east and west
@@ -109,6 +116,7 @@ wordcloud_east_west <- function(max_words) {
                     rotation = 0.25,
                     color = RColorBrewer::brewer.pal(8, "Dark2")
     )
+    title(main = "Telegram: significant words in East Germany")
     set.seed(100)
     textplot_wordcloud(dfm_subset(dfmat, region == "west"),
                     min_count = 4,
@@ -117,6 +125,7 @@ wordcloud_east_west <- function(max_words) {
                     rotation = 0.25,
                     color = RColorBrewer::brewer.pal(8, "Dark2")
     )
+    title(main = "Telegram: significant words in West Germany")
 }
 
 #determine probability of defined dictionaries and print them in grouped barplots
@@ -127,7 +136,7 @@ plot_prob_defined_subdicts <- function() {
         dfm_remove(pattern = stopwords("german"))
     #par(mfrow = c(1, 2))
     #group the feature matrix by c(ost, west, bund)
-    dfmat <- dfmat_0 |> dfm_group(groups = region) |>
+    dfmat <- dfm_group(dfmat_0, groups = region) |>
         dfm_weight(scheme = "prop")
     #print(dfmat)
     text_freq <- textstat_frequency(dfmat, groups = region) %>%
@@ -140,9 +149,11 @@ plot_prob_defined_subdicts <- function() {
         #col = c("lightblue", "#bae4ba"),
         legend.text = text_freq$feature,
         ylim = c(0, 1),
-        beside = TRUE)
+        main = "Telegram: dictionary performed by East-West division",
+        beside = TRUE
+    )
     #group the feature matrix by states
-    dfmat <- dfmat_0 |> dfm_group(groups = state) |>
+    dfmat <- dfm_group(dfmat_0, groups = state) |>
         dfm_weight(scheme = "prop")
     #print(dfmat)
     text_freq <- textstat_frequency(dfmat, groups = state) %>%
@@ -154,7 +165,9 @@ plot_prob_defined_subdicts <- function() {
         #col = c("lightblue", "#bae4ba"),
         legend.text = text_freq$feature,
         ylim = c(0, 1),
-        beside = TRUE)
+        main = "Telegram: dictionary performed by state",
+        beside = TRUE
+    )
 }
 
 
