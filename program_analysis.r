@@ -71,7 +71,7 @@ rpc_dict <<- as.dictionary(rpc_dict_df, tolower = TRUE)
 
 #create corpus and the corpus that is tokenized
 corp <<- corpus(rawdata)
-corp_tkns <<- corp |> tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE)
+corp_tkns <<- corp |> tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE, remove_numbers = TRUE)
 
 #wordclouds between east and west
 wordcloud_east_west <- function(max_words) {
@@ -97,6 +97,35 @@ wordcloud_east_west <- function(max_words) {
                     color = RColorBrewer::brewer.pal(8, "Dark2")
     )
     title(main = "manifestos: significant words in West Germany")
+}
+
+#wordclouds grouped by category in dictionary
+wordcloud_categories_dict <- function(max_words) {
+    dfmat <- NULL
+    for (i in c(1:4)) {
+        dfm_i <- corp_tkns |>
+            tokens_select(pattern = rpc_dict[i]) |>
+            dfm(tolower = TRUE) |>
+            dfm_remove(pattern = stopwords("german"))
+        docvars(dfm_i, "cat") <- names(rpc_dict[i])
+        dfm_i <- dfm_group(dfm_i, groups = cat)
+        if (i == 1) {
+            dfmat <- dfm_i
+        } else {
+           dfmat <- rbind(dfmat, dfm_i)
+        }
+    }
+    #print(head(textstat_frequency(dfmat), 50))
+    print(topfeatures(dfmat, groups = docnames(dfmat)))
+    set.seed(100)
+    textplot_wordcloud(dfmat,
+                    max_words = max_words,
+                    random_order = FALSE,
+                    rotation = 0.25,
+                    comparison = TRUE,
+                    #color = RColorBrewer::brewer.pal(8, "Dark2")
+    )
+    title(main = "manifestos: significant words relating to sub-dictionaries")
 }
 
 #determine probability of defined dictionaries and print them in grouped barplots
@@ -125,7 +154,7 @@ plot_prob_defined_subdicts <- function() {
     )
     #group the feature matrix by states
     dfmat <- dfmat_0 |> dfm_weight(scheme = "prop")
-    docnames(dfmat) <- paste(docnames(dfmat), dfmat$year %% 100)
+    docnames(dfmat) <- paste0(docnames(dfmat), dfmat$year %% 100)
     barplot(t(convert(dfmat, to = "matrix")),
         #col = c("lightblue", "#bae4ba"),
         legend.text = text_freq$feature,
@@ -137,6 +166,8 @@ plot_prob_defined_subdicts <- function() {
 
 
 wordcloud_east_west(60)
+
+wordcloud_categories_dict(100)
 
 plot_prob_defined_subdicts()
 

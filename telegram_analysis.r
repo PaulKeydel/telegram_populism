@@ -178,7 +178,7 @@ plot_msgs_state_dist()
 
 wordcloud_react_rate(40)
 
-wordcloud_east_west(70)
+wordcloud_east_west(60)
 
 plot_prob_defined_subdicts()
 
