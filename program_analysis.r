@@ -64,10 +64,29 @@ for (i in c(1:length(RPC_subdicts))) {
 rpc_dict_df <- read_delim(paste0(data_dir, "/rpc_lex.csv"),
                           delim = ";", locale = locale(decimal_mark = ",")
 )
-rpc_dict_df <- select(rpc_dict_df, term, category_en)
-rpc_dict_df <- filter(rpc_dict_df, category_en %in% selected_subdicts)
-colnames(rpc_dict_df) <- c("word", "sentiment")
-rpc_dict <<- as.dictionary(rpc_dict_df, tolower = TRUE)
+rpc_dict_df <- mutate(rpc_dict_df,
+    perspective = case_when(category_en == "Scandalization" ~ "style",
+                            category_en == "Suspicion/manipulation " ~ "style",
+                            category_en == "Exposure/revelation" ~ "style",
+                            category_en == "Markers of distance" ~ "style",
+                            category_en == "Conspiracy" ~ "topoi",
+                            category_en == "Antisemitism" ~ "antagonisms",
+                            category_en == "Anti-elitism" ~ "antagonisms",
+                            category_en == "Apocalypse/downfall " ~ "topoi",
+                            category_en == "Protest/rebellion" ~ "topoi",
+                            category_en == "Nationalism" ~ "topoi",
+                            category_en == "Anti-immigration/islamophobia" ~ "antagonisms",
+                            category_en == "Anti-gender/anti-feminism" ~ "antagonisms",
+                            category_en == "Esotericism" ~ "topoi")
+    )
+rpc_dict_df_0 <- select(rpc_dict_df, term, category_en)
+rpc_dict_df_0 <- filter(rpc_dict_df_0, category_en %in% selected_subdicts)
+colnames(rpc_dict_df_0) <- c("word", "sentiment")
+rpc_dict <<- as.dictionary(rpc_dict_df_0, tolower = TRUE)
+
+rpc_dict_df_1 <- select(rpc_dict_df, term, perspective)
+colnames(rpc_dict_df_1) <- c("word", "sentiment")
+rpc_dict_grouped <<- as.dictionary(rpc_dict_df_1, tolower = TRUE)
 
 #create corpus and the corpus that is tokenized
 corp <<- corpus(rawdata)
@@ -115,21 +134,37 @@ wordcloud_categories_dict <- function(max_words) {
            dfmat <- rbind(dfmat, dfm_i)
         }
     }
-    #print(head(textstat_frequency(dfmat), 50))
-    print(topfeatures(dfmat, groups = docnames(dfmat)))
+    #topfeatures(dfmat, groups = docnames(dfmat))
     set.seed(100)
     textplot_wordcloud(dfmat,
                     max_words = max_words,
                     random_order = FALSE,
                     rotation = 0.25,
                     comparison = TRUE,
-                    #color = RColorBrewer::brewer.pal(8, "Dark2")
+                    color = RColorBrewer::brewer.pal(4, "Dark2")
     )
     title(main = "manifestos: significant words relating to sub-dictionaries")
 }
 
-#determine probability of defined dictionaries and print them in grouped barplots
-plot_prob_defined_subdicts <- function() {
+#plot distribution of grouped dictionary
+plot_dist_grouped_subdicts <- function() {
+    dfmat <- corp_tkns |>
+        tokens_lookup(dictionary = rpc_dict_grouped) |>
+        dfm(tolower = TRUE) |>
+        dfm_remove(pattern = stopwords("german"))
+    fstat <- textstat_frequency(dfmat)
+    total <- sum(fstat$frequency)
+    bp <- barplot(height = fstat$frequency / total,
+            names.arg = fstat$feature,
+            ylim = c(0, 1),
+            main = "manifestos: application of grouped dictionary",
+            col = RColorBrewer::brewer.pal(3, "Blues")
+    )
+    text(bp, fstat$frequency / total + 0.1, paste0(round(100 * fstat$frequency / total, 2), "%"), cex = 1)
+}
+
+#plot distribution of defined dictionaries and print them in grouped barplots
+plot_dist_defined_subdicts <- function() {
     dfmat_0 <- corp_tkns |>
         tokens_lookup(dictionary = rpc_dict) |>
         dfm(tolower = TRUE) |>
@@ -146,7 +181,7 @@ plot_prob_defined_subdicts <- function() {
     colnames(t) <- c("East", "West")
     rownames(t) <- text_freq$feature
     barplot(t,
-        #col = c("lightblue", "#bae4ba"),
+        col = RColorBrewer::brewer.pal(4, "Blues"),
         legend.text = text_freq$feature,
         ylim = c(0, 1),
         main = "manifestos: dictionary performed by East-West division",
@@ -156,7 +191,7 @@ plot_prob_defined_subdicts <- function() {
     dfmat <- dfmat_0 |> dfm_weight(scheme = "prop")
     docnames(dfmat) <- paste0(docnames(dfmat), dfmat$year %% 100)
     barplot(t(convert(dfmat, to = "matrix")),
-        #col = c("lightblue", "#bae4ba"),
+        col = RColorBrewer::brewer.pal(4, "Blues"),
         legend.text = text_freq$feature,
         ylim = c(0, 1),
         main = "manifestos: dictionary performed by state",
@@ -169,12 +204,6 @@ wordcloud_east_west(60)
 
 wordcloud_categories_dict(100)
 
-plot_prob_defined_subdicts()
+plot_dist_grouped_subdicts()
 
-
-dfmat_3 <- corp_tkns |>
-    dfm(tolower = TRUE) |>
-    dfm_remove(pattern = stopwords("german")) |>
-    dfm_group(groups = region)
-print(dfmat_3, max_nfeat = 20)
-textstat_simil(dfmat_3, method = "correlation", margin = "documents")
+plot_dist_defined_subdicts()

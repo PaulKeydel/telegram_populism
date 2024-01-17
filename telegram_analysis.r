@@ -59,10 +59,29 @@ for (i in c(1:length(RPC_subdicts))) {
 rpc_dict_df <- read_delim(paste0(data_dir, "/rpc_lex.csv"),
                           delim = ";", locale = locale(decimal_mark = ",")
 )
-rpc_dict_df <- select(rpc_dict_df, term, category_en)
-rpc_dict_df <- filter(rpc_dict_df, category_en %in% selected_subdicts)
-colnames(rpc_dict_df) <- c("word", "sentiment")
-rpc_dict <<- as.dictionary(rpc_dict_df, tolower = TRUE)
+rpc_dict_df <- mutate(rpc_dict_df,
+    perspective = case_when(category_en == "Scandalization" ~ "style",
+                            category_en == "Suspicion/manipulation " ~ "style",
+                            category_en == "Exposure/revelation" ~ "style",
+                            category_en == "Markers of distance" ~ "style",
+                            category_en == "Conspiracy" ~ "topoi",
+                            category_en == "Antisemitism" ~ "antagonisms",
+                            category_en == "Anti-elitism" ~ "antagonisms",
+                            category_en == "Apocalypse/downfall " ~ "topoi",
+                            category_en == "Protest/rebellion" ~ "topoi",
+                            category_en == "Nationalism" ~ "topoi",
+                            category_en == "Anti-immigration/islamophobia" ~ "antagonisms",
+                            category_en == "Anti-gender/anti-feminism" ~ "antagonisms",
+                            category_en == "Esotericism" ~ "topoi")
+    )
+rpc_dict_df_0 <- select(rpc_dict_df, term, category_en)
+rpc_dict_df_0 <- filter(rpc_dict_df_0, category_en %in% selected_subdicts)
+colnames(rpc_dict_df_0) <- c("word", "sentiment")
+rpc_dict <<- as.dictionary(rpc_dict_df_0, tolower = TRUE)
+
+rpc_dict_df_1 <- select(rpc_dict_df, term, perspective)
+colnames(rpc_dict_df_1) <- c("word", "sentiment")
+rpc_dict_grouped <<- as.dictionary(rpc_dict_df_1, tolower = TRUE)
 
 #create corpus and the corpus that is tokenized
 corp <<- corpus(rawdata)
@@ -128,8 +147,25 @@ wordcloud_east_west <- function(max_words) {
     title(main = "Telegram: significant words in West Germany")
 }
 
-#determine probability of defined dictionaries and print them in grouped barplots
-plot_prob_defined_subdicts <- function() {
+#plot distribution of grouped dictionary
+plot_dist_grouped_subdicts <- function() {
+    dfmat <- corp_tkns |>
+        tokens_lookup(dictionary = rpc_dict_grouped) |>
+        dfm(tolower = TRUE) |>
+        dfm_remove(pattern = stopwords("german"))
+    fstat <- textstat_frequency(dfmat)
+    total <- sum(fstat$frequency)
+    bp <- barplot(height = fstat$frequency / total,
+            names.arg = fstat$feature,
+            ylim = c(0, 1),
+            main = "Telegram: application of grouped dictionary",
+            col = RColorBrewer::brewer.pal(3, "Blues")
+    )
+    text(bp, fstat$frequency / total + 0.1, paste0(round(100 * fstat$frequency / total, 2), "%"), cex = 1)
+}
+
+#plot distribution of defined dictionaries and print them in grouped barplots
+plot_dist_defined_subdicts <- function() {
     dfmat_0 <- corp_tkns |>
         tokens_lookup(dictionary = rpc_dict) |>
         dfm(tolower = TRUE) |>
@@ -146,7 +182,7 @@ plot_prob_defined_subdicts <- function() {
     colnames(t) <- c("Bund", "Ost", "West")
     rownames(t) <- text_freq$feature
     barplot(t,
-        #col = c("lightblue", "#bae4ba"),
+        col = RColorBrewer::brewer.pal(4, "Blues"),
         legend.text = text_freq$feature,
         ylim = c(0, 1),
         main = "Telegram: dictionary performed by East-West division",
@@ -162,7 +198,7 @@ plot_prob_defined_subdicts <- function() {
     t <- as.matrix(select(text_freq, -feature, -Bund))
     rownames(t) <- text_freq$feature
     barplot(t,
-        #col = c("lightblue", "#bae4ba"),
+        col = RColorBrewer::brewer.pal(4, "Blues"),
         legend.text = text_freq$feature,
         ylim = c(0, 1),
         main = "Telegram: dictionary performed by state",
@@ -180,21 +216,6 @@ wordcloud_react_rate(40)
 
 wordcloud_east_west(60)
 
-plot_prob_defined_subdicts()
+plot_dist_grouped_subdicts()
 
-
-
-df0 <- data.frame(docname = docnames(dfmat_0),
-                 region = docvars(dfmat_0, c("region")),
-                 popcat = colnames(dfmat_0)[max.col(dfmat_0)],
-                 row.names = NULL)
-df0 <- df0 %>% mutate(anti_elite = ifelse(popcat == "anti-elitism", 1, 0))
-df0 <- df0 %>% mutate(anti_immigration = ifelse(popcat == "anti-immigration/islamophobia", 1, 0))
-
-
-dfmat_3 <- corp_tkns |>
-    dfm(tolower = TRUE) |>
-    dfm_remove(pattern = stopwords("german")) |>
-    dfm_group(groups = region)
-print(dfmat_3, max_nfeat = 20)
-textstat_simil(dfmat_3, method = "correlation", margin = "documents")
+plot_dist_defined_subdicts()
