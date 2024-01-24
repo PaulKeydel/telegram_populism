@@ -7,6 +7,7 @@ library("quanteda.textstats")
 library("dplyr")
 library("tidyr")
 library("readr")
+library("ggplot2")
 
 #working directory
 data_dir <- "/Users/paulkeydel/Documents/coding projects/telegram/"
@@ -199,6 +200,29 @@ plot_dist_defined_subdicts <- function() {
     )
 }
 
+temporal_plot_subdicts <- function(geo_region = "") {
+    dfmat <- corp_tkns |>
+        tokens_lookup(dictionary = rpc_dict) |>
+        dfm(tolower = TRUE) |>
+        dfm_remove(pattern = stopwords("german"))
+    if (geo_region == "") {
+        dfmat <- dfmat |>
+            dfm_weight(scheme = "prop")
+    } else {
+       dfmat <- dfmat |>
+            dfm_subset(region == geo_region) |>
+            dfm_weight(scheme = "prop")
+    }
+    t <- convert(dfmat, to = "data.frame")
+    t <- cbind(year = docvars(dfmat, "year"), t)
+    t <- select(t, -doc_id)
+    t <- gather(t, "antagonism", "percentage", -year)
+    ggplot(data = t, aes(x = year,  y = percentage, color = antagonism)) +
+        geom_point() +
+        geom_smooth(method = "lm", se = FALSE) +
+        ggtitle(paste("Temporal analysis:", geo_region))
+}
+
 
 wordcloud_east_west(60)
 
@@ -207,3 +231,6 @@ wordcloud_categories_dict(100)
 plot_dist_grouped_subdicts()
 
 plot_dist_defined_subdicts()
+
+temporal_plot_subdicts("west")
+temporal_plot_subdicts("ost")
