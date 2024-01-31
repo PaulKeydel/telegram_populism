@@ -93,31 +93,6 @@ rpc_dict_grouped <<- as.dictionary(rpc_dict_df_1, tolower = TRUE)
 corp <<- corpus(rawdata)
 corp_tkns <<- corp |> tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE, remove_numbers = TRUE)
 
-#wordclouds between east and west
-wordcloud_east_west <- function(max_words) {
-    dfmat <- corp_tkns |>
-        dfm(tolower = TRUE) |>
-        dfm_remove(pattern = stopwords("german"))
-    #print(topfeatures(dfmat, groups = region, 20))
-    set.seed(100)
-    textplot_wordcloud(dfm_subset(dfmat, region == "ost"),
-                    min_count = 4,
-                    max_words = max_words,
-                    random_order = FALSE,
-                    rotation = 0.25,
-                    color = RColorBrewer::brewer.pal(8, "Dark2")
-    )
-    title(main = "manifestos: significant words in East Germany")
-    set.seed(100)
-    textplot_wordcloud(dfm_subset(dfmat, region == "west"),
-                    min_count = 4,
-                    max_words = max_words,
-                    random_order = FALSE,
-                    rotation = 0.25,
-                    color = RColorBrewer::brewer.pal(8, "Dark2")
-    )
-    title(main = "manifestos: significant words in West Germany")
-}
 
 #wordclouds grouped by category in dictionary
 wordcloud_unique_words_subdicts <- function(min_count) {
@@ -136,7 +111,6 @@ wordcloud_unique_words_subdicts <- function(min_count) {
             tokens_select(pattern = complement_set, selection = "remove") |>
             dfm(tolower = TRUE) |>
             dfm_remove(pattern = stopwords("german"))
-        #dfm_i <- dfm_subset(dfm_i, region == "west")
         docvars(dfm_i, "cat") <- names(rpc_dict[i])
         dfm_i <- dfm_group(dfm_i, groups = cat)
         if (i == 1) {
@@ -173,46 +147,50 @@ plot_dist_grouped_subdicts <- function() {
     text(bp, fstat$frequency / total + 0.1, paste0(round(100 * fstat$frequency / total, 2), "%"), cex = 1)
 }
 
-#plot distribution of defined dictionaries and print them in grouped barplots
-plot_dist_defined_subdicts <- function() {
+#plot the distribution of subdicts per state and term, calc temporal differences per states
+plot_dist_subdicts_per_state <- function() {
     dfmat_0 <- corp_tkns |>
         tokens_lookup(dictionary = rpc_dict) |>
         dfm(tolower = TRUE) |>
         dfm_remove(pattern = stopwords("german"))
-    #group the feature matrix by c(ost, west, bund)
-    dfmat <- dfm_group(dfmat_0, groups = region) |>
+    dfmat_13_18 <- dfm_subset(dfmat_0, year <= 2018) |>
+        dfm_group(groups = state) |>
         dfm_weight(scheme = "prop")
-    text_freq <- textstat_frequency(dfmat, groups = region) %>%
-        select(feature, frequency, group) %>%
-        spread(key = group, value = frequency)
-    t <- as.matrix(select(text_freq, ost, west))
-    colnames(t) <- c("East", "West")
-    rownames(t) <- text_freq$feature
-    barplot(t,
+    dist_13_18 <- t(convert(dfmat_13_18, to = "matrix"))
+    names(dimnames(dist_13_18)) <- NULL
+    barplot(dist_13_18,
         col = RColorBrewer::brewer.pal(4, "Blues"),
-        legend.text = text_freq$feature,
+        legend.text = rownames(dist_13_18),
+        names.arg = paste0(docnames(dfmat_13_18), docvars(dfmat_13_18, "year") %% 100),
         ylim = c(0, 1),
-        main = "manifestos: dictionary performed by East-West division",
+        main = "dictionary performed by state: manifestos 2013 - 2018",
         beside = TRUE
     )
-    #group the feature matrix by states
-    dfmat <- dfm_group(dfmat_0, groups = state) |>
+    dfmat_18_23 <- dfm_subset(dfmat_0, year > 2018) |>
+        dfm_group(groups = state) |>
         dfm_weight(scheme = "prop")
-    text_freq <- textstat_frequency(dfmat, groups = state) %>%
-        select(feature, frequency, group) %>%
-        spread(key = group, value = frequency)
-    t <- as.matrix(select(text_freq, -feature))
-    rownames(t) <- text_freq$feature
-    barplot(t,
+    dist_18_23 <- t(convert(dfmat_18_23, to = "matrix"))
+    names(dimnames(dist_18_23)) <- NULL
+    barplot(dist_18_23,
         col = RColorBrewer::brewer.pal(4, "Blues"),
-        legend.text = text_freq$feature,
-        names.arg = paste0(docnames(dfmat), docvars(dfmat, "year") %% 100),
+        legend.text = rownames(dist_18_23),
+        names.arg = paste0(docnames(dfmat_18_23), docvars(dfmat_18_23, "year") %% 100),
         ylim = c(0, 1),
-        main = "manifestos: dictionary performed by state",
+        main = "dictionary performed by state: manifestos 2018 - 2023",
+        beside = TRUE
+    )
+    #plot temporal differences
+    barplot(dist_18_23[, colnames(dist_18_23) %in% colnames(dist_13_18)] - dist_13_18,
+        col = RColorBrewer::brewer.pal(4, "Blues"),
+        legend.text = rownames(dist_13_18),
+        names.arg = docnames(dfmat_13_18),
+        ylim = c(-0.1, 0.1),
+        main = "state-wise differences between election periods",
         beside = TRUE
     )
 }
 
+#distribution of anatogonisms over election year, plus linear regression
 temporal_plot_subdicts <- function(geo_region = "") {
     dfmat <- corp_tkns |>
         tokens_lookup(dictionary = rpc_dict) |>
@@ -236,14 +214,48 @@ temporal_plot_subdicts <- function(geo_region = "") {
         ggtitle(paste("Temporal analysis: AfD manifestos in", ifelse(geo_region == "ost", "East-Germany", "West-Germany")))
 }
 
+#wordclouds of temporal differences in specific subdicts
+wordcloud_east_west_diffs_subdicts <- function(max_words) {
+    dfm_dict3 <- corp_tkns |>
+            tokens_select(pattern = rpc_dict[3]) |>
+            dfm(tolower = TRUE) |>
+            dfm_remove(pattern = stopwords("german"))
+    d1 <- dfm_subset(dfm_dict3, region == "ost" & year > 2018)
+    d2 <- dfm_subset(dfm_dict3, region == "ost" & year <= 2018)
+    set.seed(100)
+    textplot_wordcloud(as.dfm(d1 - dfm_match(d2, features = featnames(d1))),
+                    max_words = max_words,
+                    random_order = FALSE,
+                    rotation = 0.25,
+                    color = "cornflowerblue"
+    )
+    title(main = "Anti-immigrant antagonism in East-Germany: differences to the election before")
+    dfm_dict1 <- corp_tkns |>
+            tokens_select(pattern = rpc_dict[1]) |>
+            dfm(tolower = TRUE) |>
+            dfm_remove(pattern = stopwords("german"))
+    dfm_dict1 <- dfm_subset(dfm_dict1, state != "RLP")
+    dfm_dict1 <- dfm_subset(dfm_dict1, state != "SL")
+    d1 <- dfm_subset(dfm_dict1, region == "west" & year > 2018)
+    d2 <- dfm_subset(dfm_dict1, region == "west" & year <= 2018)
+    set.seed(100)
+    textplot_wordcloud(as.dfm(d1 - dfm_match(d2, features = featnames(d1))),
+                    max_words = max_words,
+                    random_order = FALSE,
+                    rotation = 0.25,
+                    color = "cornflowerblue"
+    )
+    title(main = "Anti-elite antagonism in West-Germany: differences to the election before")
+}
 
-wordcloud_east_west(60)
 
-wordcloud_unique_words_subdicts(30)
+wordcloud_unique_words_subdicts(48)
 
 plot_dist_grouped_subdicts()
 
-plot_dist_defined_subdicts()
+plot_dist_subdicts_per_state()
 
 temporal_plot_subdicts("west")
 temporal_plot_subdicts("ost")
+
+wordcloud_east_west_diffs_subdicts(60)
