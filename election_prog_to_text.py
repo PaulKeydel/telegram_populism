@@ -17,7 +17,7 @@ program_files = [["Wahlprogramme_LTW/Wahlprogramm_Thüringen_2019_Endfassung.pd
                 ["Wahlprogramme_LTW/Bürgerschaftswahlprogramm-2020-der-AfD-Hamburg.pdf", "HH", "2020"],
                 ["Wahlprogramme_LTW/20230313_LTW23_Bremen_Programm_Broschuere_DINA5.pdf", "HB", "2023"]]
 
-df = pd.DataFrame(columns=["state", "year", "text"])
+df = pd.DataFrame(columns=["id", "state", "year", "text"])
 
 for prog in range(len(program_files)):
     #creating a pdf reader object
@@ -32,6 +32,6 @@ for prog in range(len(program_files)):
     whole_text = whole_text.replace('\t', ' ')
     state = program_files[prog][1]
     year = program_files[prog][2]
-    df = df.append({'state': state, 'year': year, 'text': whole_text}, ignore_index=True)
+    df = df.append({'id': prog, 'state': state, 'year': year, 'text': whole_text}, ignore_index=True)
 
-df.to_csv('afd_wahlprogramm.tsv', sep='\t', index=False)
+df.to_csv('afd_manifestos.tsv', sep='\t', index=False)

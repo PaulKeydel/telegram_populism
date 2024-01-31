@@ -12,13 +12,13 @@ library("ggplot2")
 #working directory
 data_dir <- "/Users/paulkeydel/Documents/coding projects/telegram/"
 
-#load main data.frame, add variables and load texts for dict validation
-rawdata <- readtext(file = paste0(data_dir, "afd_wahlprogramm.tsv"),
-                    docid_field = "state",
+#load main data.frame and add variables
+rawdata <- readtext(file = paste0(data_dir, "afd_manifestos.tsv"),
+                    docid_field = "id",
                     text_field = "text"
 )
 stopifnot(length(unique(rawdata$doc_id)) == nrow(rawdata))
-rawdata <- rawdata %>% mutate(region = sapply(doc_id, switch,
+rawdata <- rawdata %>% mutate(region = sapply(state, switch,
                               TH = "ost",
                               SN = "ost",
                               ST = "ost",
@@ -120,13 +120,23 @@ wordcloud_east_west <- function(max_words) {
 }
 
 #wordclouds grouped by category in dictionary
-wordcloud_categories_dict <- function(max_words) {
+wordcloud_unique_words_subdicts <- function(min_count) {
+    dict_len <- length(rpc_dict)
     dfmat <- NULL
-    for (i in c(1:4)) {
+    for (i in c(1:dict_len)) {
+        complement_set <- c()
+        for (j in c(1:dict_len)) {
+            if (j == i) {
+                next()
+            }
+            complement_set <- union(complement_set, unname(unlist(rpc_dict[j])))
+        }
         dfm_i <- corp_tkns |>
             tokens_select(pattern = rpc_dict[i]) |>
+            tokens_select(pattern = complement_set, selection = "remove") |>
             dfm(tolower = TRUE) |>
             dfm_remove(pattern = stopwords("german"))
+        #dfm_i <- dfm_subset(dfm_i, region == "west")
         docvars(dfm_i, "cat") <- names(rpc_dict[i])
         dfm_i <- dfm_group(dfm_i, groups = cat)
         if (i == 1) {
@@ -135,16 +145,15 @@ wordcloud_categories_dict <- function(max_words) {
            dfmat <- rbind(dfmat, dfm_i)
         }
     }
-    #topfeatures(dfmat, groups = docnames(dfmat))
     set.seed(100)
     textplot_wordcloud(dfmat,
-                    max_words = max_words,
+                    min_count = min_count,
                     random_order = FALSE,
                     rotation = 0.25,
                     comparison = TRUE,
                     color = RColorBrewer::brewer.pal(4, "Dark2")
     )
-    title(main = "manifestos: significant words relating to sub-dictionaries")
+    title(main = "manifestos: unique words in sub-dictionaries")
 }
 
 #plot distribution of grouped dictionary
@@ -170,11 +179,9 @@ plot_dist_defined_subdicts <- function() {
         tokens_lookup(dictionary = rpc_dict) |>
         dfm(tolower = TRUE) |>
         dfm_remove(pattern = stopwords("german"))
-    #par(mfrow = c(1, 2))
     #group the feature matrix by c(ost, west, bund)
     dfmat <- dfm_group(dfmat_0, groups = region) |>
         dfm_weight(scheme = "prop")
-    #print(dfmat)
     text_freq <- textstat_frequency(dfmat, groups = region) %>%
         select(feature, frequency, group) %>%
         spread(key = group, value = frequency)
@@ -189,11 +196,17 @@ plot_dist_defined_subdicts <- function() {
         beside = TRUE
     )
     #group the feature matrix by states
-    dfmat <- dfmat_0 |> dfm_weight(scheme = "prop")
-    docnames(dfmat) <- paste0(docnames(dfmat), dfmat$year %% 100)
-    barplot(t(convert(dfmat, to = "matrix")),
+    dfmat <- dfm_group(dfmat_0, groups = state) |>
+        dfm_weight(scheme = "prop")
+    text_freq <- textstat_frequency(dfmat, groups = state) %>%
+        select(feature, frequency, group) %>%
+        spread(key = group, value = frequency)
+    t <- as.matrix(select(text_freq, -feature))
+    rownames(t) <- text_freq$feature
+    barplot(t,
         col = RColorBrewer::brewer.pal(4, "Blues"),
         legend.text = text_freq$feature,
+        names.arg = paste0(docnames(dfmat), docvars(dfmat, "year") %% 100),
         ylim = c(0, 1),
         main = "manifestos: dictionary performed by state",
         beside = TRUE
@@ -220,13 +233,13 @@ temporal_plot_subdicts <- function(geo_region = "") {
     ggplot(data = t, aes(x = year,  y = percentage, color = antagonism)) +
         geom_point() +
         geom_smooth(method = "lm", se = FALSE) +
-        ggtitle(paste("Temporal analysis:", geo_region))
+        ggtitle(paste("Temporal analysis: AfD manifestos in", ifelse(geo_region == "ost", "East-Germany", "West-Germany")))
 }
 
 
 wordcloud_east_west(60)
 
-wordcloud_categories_dict(100)
+wordcloud_unique_words_subdicts(30)
 
 plot_dist_grouped_subdicts()
 
