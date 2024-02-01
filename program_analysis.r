@@ -180,7 +180,8 @@ plot_dist_subdicts_per_state <- function() {
         beside = TRUE
     )
     #plot temporal differences
-    barplot(dist_18_23[, colnames(dist_18_23) %in% colnames(dist_13_18)] - dist_13_18,
+    diff_vectors <- dist_18_23[, colnames(dist_18_23) %in% colnames(dist_13_18)] - dist_13_18
+    barplot(diff_vectors,
         col = RColorBrewer::brewer.pal(4, "Blues"),
         legend.text = rownames(dist_13_18),
         names.arg = docnames(dfmat_13_18),
@@ -188,6 +189,9 @@ plot_dist_subdicts_per_state <- function() {
         main = "state-wise differences between election periods",
         beside = TRUE
     )
+    #k-means clustering in two groups
+    res <- kmeans(t(diff_vectors), 2)
+    return(res$cluster)
 }
 
 #distribution of anatogonisms over election year, plus linear regression
@@ -223,6 +227,7 @@ wordcloud_east_west_diffs_subdicts <- function(max_words) {
     d1 <- dfm_subset(dfm_dict3, region == "ost" & year > 2018)
     d2 <- dfm_subset(dfm_dict3, region == "ost" & year <= 2018)
     set.seed(100)
+    par(mar = c(2, 2, 2, 2))
     textplot_wordcloud(as.dfm(d1 - dfm_match(d2, features = featnames(d1))),
                     max_words = max_words,
                     random_order = FALSE,
@@ -234,8 +239,8 @@ wordcloud_east_west_diffs_subdicts <- function(max_words) {
             tokens_select(pattern = rpc_dict[1]) |>
             dfm(tolower = TRUE) |>
             dfm_remove(pattern = stopwords("german"))
-    dfm_dict1 <- dfm_subset(dfm_dict1, state != "RLP")
-    dfm_dict1 <- dfm_subset(dfm_dict1, state != "SL")
+    #the following line excludes the incomplete manifesto pairs
+    dfm_dict1 <- dfm_subset(dfm_dict1, (state != "RLP") & (state != "SL"))
     d1 <- dfm_subset(dfm_dict1, region == "west" & year > 2018)
     d2 <- dfm_subset(dfm_dict1, region == "west" & year <= 2018)
     set.seed(100)
@@ -253,7 +258,8 @@ wordcloud_unique_words_subdicts(48)
 
 plot_dist_grouped_subdicts()
 
-plot_dist_subdicts_per_state()
+clusters <- plot_dist_subdicts_per_state()
+sort(clusters)
 
 temporal_plot_subdicts("west")
 temporal_plot_subdicts("ost")
