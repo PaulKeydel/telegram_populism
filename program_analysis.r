@@ -8,6 +8,7 @@ library("dplyr")
 library("tidyr")
 library("readr")
 library("ggplot2")
+library("ggfortify")
 
 #working directory
 data_dir <- "/Users/paulkeydel/Documents/coding projects/telegram/"
@@ -189,6 +190,21 @@ plot_dist_subdicts_per_state <- function() {
         main = "state-wise differences between election periods",
         beside = TRUE
     )
+    #apply a principal component analysis to the temporal differences in order to detect clusters
+    diff_vec_df <- as.data.frame(t(diff_vectors))
+    diff_vec_df <- cbind(diff_vec_df, region = docvars(dfmat_13_18, "region"))
+    diff_vec_df$region <- ifelse(diff_vec_df$region == "ost", "East Germany", "West Germany")
+    res_prc <- prcomp(diff_vec_df[, c(1:4)])
+    autoplot(res_prc,
+            data = diff_vec_df,
+            colour = "region",
+            label = TRUE,
+            shape = FALSE,
+            label.size = 4,
+            loadings = TRUE,
+            loadings.label = TRUE,
+            loadings.colour = "blue") +
+        ggtitle("Principal component analysis of the antagonism differences")
     #k-means clustering in two groups
     res <- kmeans(t(diff_vectors), 2)
     return(res$cluster)
