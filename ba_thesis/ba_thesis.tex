@@ -1,34 +1,86 @@
-% Use the KomaScript styling on A4 paper
+%use the KomaScript styling on A4 paper
 \documentclass[a4paper]{scrreprt}
-
-% Use UTF-8 encoding
+%package for citing in Harvard style
+\usepackage{natbib}
+\bibliographystyle{agsm}
+%use UTF-8 encoding
 \usepackage[utf8]{inputenc}
-
-
-\title{A very simple document}
-\author{Oliver Klee}
-\date{\today\ (a very good day)}
-
+\usepackage{graphicx}
+\graphicspath{{"./figs"}}
 
 \begin{document}
 
 \begin{titlepage}
 \centering
-\vspace{4\baselineskip}
-{\Huge Rechtspopulismus mit und in der AfD\par}
+{\large\textsc{Bachelor thesis}\par}
+\vspace{8\baselineskip}
+{\Huge The right-wing populism of the AfD party and its regional differences\par}
 \vspace{2\baselineskip}
-{\Large Die AfD und Populismusvariationen in den neuen und alten Bundesländern\par}
-\vspace{4\baselineskip}
-{\large\textsc{von\\[.5em]Dipl.-Math. Paul Keydel}}
+{\Large A quantitative analysis on populist antagonisms within the programmatic discourse\par}
+\vspace{5\baselineskip}
+{\large\textsc{submitted by\\[.5em]Dipl.-Math. Paul Keydel}}
 \vfill
-{\em Freie Universität Berlin}
+{\em Freie Universität Berlin, April 2024}
 \end{titlepage}
 
 \tableofcontents
 
-\chapter{Einführung}
+\chapter{Introduction}
+The aim of this thesis is to bla bla
+
 \chapter{Populismus im Kontext von Demokratie und Repräsentation}
 \section{Ursachen und Typologie des Populismus}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{manifestos_unique_words_subdicts.pdf}
+    \caption{a nice plot}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{manifestos_grouped_dict.pdf}
+    \caption{a nice plot}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{manifestos_dict_states_2013.pdf}
+    \caption{a nice plot}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{manifestos_dict_states_2018.pdf}
+    \caption{a nice plot}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{manifestos_dict_states_diffs.pdf}
+    \caption{a nice plot}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{manifestos_diffs_pca.pdf}
+    \caption{a nice plot}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{manifestos_temporal_regression_west.pdf}
+    \caption{a nice plot}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{manifestos_temporal_regression_east.pdf}
+    \caption{a nice plot}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{manifestos_wordcloud_diffs_west.pdf}
+    \caption{a nice plot}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{manifestos_wordcloud_diffs_east.pdf}
+    \caption{a nice plot}
+\end{figure}
+
 \section{Populismus als Ideologie der Demokratie}
 \section{Populismus als Bewegung}
 \chapter{Rechtspopulismus und die AfD in Deutschland}
@@ -40,5 +92,8 @@
 \section{Ergebnisse}
 \chapter{Methodenkritik}
 \chapter{Fazit und Ausblick}
+Let's start citing \citep[p.~22]{canovan:2002}
+
+\bibliography{refs}
 
 \end{document}
