@@ -186,13 +186,17 @@ plot_dist_subdicts_per_state <- function() {
         col = RColorBrewer::brewer.pal(4, "Blues"),
         legend.text = rownames(dist_13_18),
         names.arg = docnames(dfmat_13_18),
-        ylim = c(-0.1, 0.1),
+        ylim = c(-0.06, 0.06),
         main = "state-wise differences between election periods",
         beside = TRUE
     )
-    #apply a principal component analysis to the temporal differences in order to detect clusters
-    diff_vec_df <- as.data.frame(t(diff_vectors))
-    diff_vec_df <- cbind(diff_vec_df, region = docvars(dfmat_13_18, "region"))
+    return(list("diff_matrix" = t(diff_vectors), "linked_regions" = docvars(dfmat_13_18, "region")))
+}
+
+#apply a principal component analysis to the temporal differences in order to detect clusters
+plot_pca_diff_matrix <- function(diff_matrix, linked_regions) {
+    diff_vec_df <- as.data.frame(diff_matrix)
+    diff_vec_df <- cbind(diff_vec_df, region = linked_regions)
     diff_vec_df$region <- ifelse(diff_vec_df$region == "ost", "East Germany", "West Germany")
     res_prc <- prcomp(diff_vec_df[, c(1:4)])
     autoplot(res_prc,
@@ -205,9 +209,6 @@ plot_dist_subdicts_per_state <- function() {
             loadings.label = TRUE,
             loadings.colour = "blue") +
         ggtitle("Principal component analysis of the antagonism differences")
-    #k-means clustering in two groups
-    res <- kmeans(t(diff_vectors), 2)
-    return(res$cluster)
 }
 
 #distribution of anatogonisms over election year, plus linear regression
@@ -274,8 +275,11 @@ wordcloud_unique_words_subdicts(48)
 
 plot_dist_grouped_subdicts()
 
-clusters <- plot_dist_subdicts_per_state()
-sort(clusters)
+diff_obj <- plot_dist_subdicts_per_state()
+#k-means clustering in two groups
+biclust <- kmeans(diff_obj$diff_matrix, 2)
+sort(biclust$cluster)
+plot_pca_diff_matrix(diff_obj$diff_matrix, diff_obj$linked_regions)
 
 temporal_plot_subdicts("west")
 temporal_plot_subdicts("ost")
