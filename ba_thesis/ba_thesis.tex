@@ -3,7 +3,7 @@
 %package for citing in Harvard style
 \usepackage{natbib}
 \bibliographystyle{agsm}
-%use UTF-8 encoding
+\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \graphicspath{{"./figs"}}
@@ -25,51 +25,70 @@
 
 \tableofcontents
 
+%%%%%
+% 1 %
+%%%%%
 \chapter{Introduction}
 The aim of this thesis is to bla bla
-
-\chapter{Populismus im Kontext von Demokratie und Repräsentation}
-\section{Ursachen und Typologie des Populismus}
+%%%%%
+% 2 %
+%%%%%
+\chapter{Populism as ideology of the democracy}
+\section{What is an ideology?}
+\section{Populism: the bridge between \guilsinglright the people\guilsinglleft\ and \guilsinglright the politics\guilsinglleft}
+\section{The role of antagonisms}
+%%%%%
+% 3 %
+%%%%%
+\chapter{The AfD party and its right-wing populism}
+\section{Usage of right-wing antagonisms and recent developments in federal states}
+\section{Towards an analysis of the programmatic discourse}
+%%%%%
+% 4 %
+%%%%%
+\chapter{An analysis of antagonisms within AfD manifestos}
+\section{Methodological considerations: A dictionary-based approach}
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{manifestos_unique_words_subdicts.pdf}
     \caption{a nice plot}
 \end{figure}
+\section{Results for the last two state elections}
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\textwidth]{manifestos_grouped_dict.pdf}
+    \includegraphics[width=\textwidth]{manifestos_dict_states_2013.pdf}
     \caption{a nice plot}
 \end{figure}
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\textwidth]{manifestos_dict_states_2013.pdf}
+    \includegraphics[width=\textwidth]{manifestos_dict_states_2018.pdf}
+    \caption{a nice plot}
+\end{figure}
+\section{Temporal changes between East and West Germany}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{manifestos_dict_states_diffs.pdf}
     \caption{a nice plot}
 \end{figure}
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\textwidth]{manifestos_dict_states_2018.pdf}
+    \includegraphics[width=\textwidth]{manifestos_diffs_pca.pdf}
     \caption{a nice plot}
 \end{figure}
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\textwidth]{manifestos_dict_states_diffs.pdf}
+    \includegraphics[width=\textwidth]{manifestos_temporal_regression_west.pdf}
     \caption{a nice plot}
 \end{figure}
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\textwidth]{manifestos_diffs_pca.pdf}
+    \includegraphics[width=\textwidth]{manifestos_temporal_regression_east.pdf}
     \caption{a nice plot}
 \end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\textwidth]{manifestos_temporal_regression_west.pdf}
-    \caption{a nice plot}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\textwidth]{manifestos_temporal_regression_east.pdf}
-    \caption{a nice plot}
-\end{figure}
+%%%%%
+% 5 %
+%%%%%
+\chapter{Evaluation of the findings and validation}
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{manifestos_wordcloud_diffs_west.pdf}
@@ -80,18 +99,10 @@ The aim of this thesis is to bla bla
     \includegraphics[width=0.9\textwidth]{manifestos_wordcloud_diffs_east.pdf}
     \caption{a nice plot}
 \end{figure}
-
-\section{Populismus als Ideologie der Demokratie}
-\section{Populismus als Bewegung}
-\chapter{Rechtspopulismus und die AfD in Deutschland}
-\section{Aktuelle Forschungsdebatte: Rechte Diskurse und die Rolle der AfD}
-\section{Unterschiedliche Entwicklungen zwischen Ost und West}
-\chapter{Empirische Untersuchungen}
-\section{Forschungsdesign}
-\section{Entwicklung und Validierung der Dictionaries}
-\section{Ergebnisse}
-\chapter{Methodenkritik}
-\chapter{Fazit und Ausblick}
+%%%%%
+% 6 %
+%%%%%
+\chapter{Conclusion and final comments}
 Let's start citing \citep[p.~22]{canovan:2002}
 
 \bibliography{refs}
