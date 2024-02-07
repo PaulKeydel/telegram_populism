@@ -106,9 +106,10 @@ plot_msgs_state_dist <- function() {
 wordcloud_react_rate <- function(max_words) {
     corp_sort <- arrange(corp, desc(react_rate))
     summary(corp_sort)
-    dfmat <- corp_sort[1:50] |>
+    dfmat <- corp_sort[1:100] |>
         tokens(remove_punct = TRUE, remove_symbols = TRUE, remove_url = TRUE) |>
         dfm(tolower = TRUE) |>
+        dfm_keep(min_nchar = 3) |>
         dfm_remove(pattern = stopwords("german"))
     set.seed(100)
     textplot_wordcloud(dfmat,
@@ -118,7 +119,7 @@ wordcloud_react_rate <- function(max_words) {
                     rotation = 0.25,
                     color = RColorBrewer::brewer.pal(8, "Dark2")
     )
-    title(main = "Telegram: wordcloud of highest feedbacked messages")
+    title(main = "Telegram: wordcloud of most feedbacked messages")
 }
 
 #wordclouds between east and west
@@ -212,7 +213,7 @@ rawdata %>% group_by(region) %>% summarise(n = n(), r = n() / nrow(rawdata))
 
 plot_msgs_state_dist()
 
-wordcloud_react_rate(40)
+wordcloud_react_rate(75)
 
 wordcloud_east_west(60)
 
