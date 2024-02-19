@@ -28,7 +28,9 @@ program_files = [["Wahlprogramme_LTW/Wahlprogramm_Thüringen_2019_Endfassung.pd
                 ["Wahlprogramme_LTW/Bürgerschaftswahlprogramm-2020-der-AfD-Hamburg.pdf", "HH", "2020"],
                 ["Wahlprogramme_LTW/afd-wahlprogramm_buewa_2015.pdf", "HH", "2015"],
                 ["Wahlprogramme_LTW/20230313_LTW23_Bremen_Programm_Broschuere_DINA5.pdf", "HB", "2023"],
-                ["Wahlprogramme_LTW/afd_wahlprogramm_bremen2019.pdf", "HB", "2018"]]
+                ["Wahlprogramme_LTW/afd_wahlprogramm_bremen2019.pdf", "HB", "2018"],
+                ["Wahlprogramme_LTW/afd_berlin_wahlprogramm_a5_rz.pdf", "BE", "2016"],
+                ["Wahlprogramme_LTW/Berlin-abernormal_lang_download.pdf", "BE", "2021"]]
 
 df = pd.DataFrame(columns=["id", "state", "year", "text"])
 

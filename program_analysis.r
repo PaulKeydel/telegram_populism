@@ -34,7 +34,8 @@ rawdata <- rawdata %>% mutate(region = sapply(state, switch,
                               HE = "west",
                               NI = "west",
                               HH = "west",
-                              HB = "west")
+                              HB = "west",
+                              BE = "Berlin")
 )
 
 
@@ -80,7 +81,7 @@ rpc_dict_df <- mutate(rpc_dict_df,
                             category_en == "Anti-immigration/islamophobia" ~ "antagonisms",
                             category_en == "Anti-gender/anti-feminism" ~ "antagonisms",
                             category_en == "Esotericism" ~ "topoi")
-    )
+)
 rpc_dict_df_0 <- select(rpc_dict_df, term, category_en)
 rpc_dict_df_0 <- filter(rpc_dict_df_0, category_en %in% selected_subdicts)
 colnames(rpc_dict_df_0) <- c("word", "sentiment")
@@ -128,7 +129,7 @@ wordcloud_unique_words_subdicts <- function(min_count) {
                     comparison = TRUE,
                     color = RColorBrewer::brewer.pal(4, "Dark2")
     )
-    title(main = "manifestos: unique words in sub-dictionaries")
+    title(main = "manifestos: word frequency within disjoint sub-dictionaries")
 }
 
 #plot distribution of grouped dictionary
@@ -176,6 +177,7 @@ plot_dist_subdicts_per_state <- function() {
         col = RColorBrewer::brewer.pal(4, "Blues"),
         legend.text = rownames(dist_18_23),
         names.arg = paste0(docnames(dfmat_18_23), docvars(dfmat_18_23, "year") %% 100),
+        cex.names = 0.82,
         ylim = c(0, 1),
         main = "dictionary performed by state: manifestos 2018 - 2023",
         beside = TRUE
@@ -197,7 +199,8 @@ plot_dist_subdicts_per_state <- function() {
 plot_pca_diff_matrix <- function(diff_matrix, linked_regions) {
     diff_vec_df <- as.data.frame(diff_matrix)
     diff_vec_df <- cbind(diff_vec_df, region = linked_regions)
-    diff_vec_df$region <- ifelse(diff_vec_df$region == "ost", "East Germany", "West Germany")
+    diff_vec_df$region[diff_vec_df$region == "ost"] <- "East Germany"
+    diff_vec_df$region[diff_vec_df$region == "west"] <- "West Germany"
     res_prc <- prcomp(diff_vec_df[, c(1:4)])
     autoplot(res_prc,
             data = diff_vec_df,
@@ -256,8 +259,9 @@ wordcloud_east_west_diffs_subdicts <- function(max_words) {
             tokens_select(pattern = rpc_dict[1]) |>
             dfm(tolower = TRUE) |>
             dfm_remove(pattern = stopwords("german"))
-    #the following line excludes the incomplete manifesto pairs
-    dfm_dict1 <- dfm_subset(dfm_dict1, (state != "RLP") & (state != "SL"))
+    #the following lines exclude the incomplete manifesto pairs
+    state_tbl <- table(dfm_dict1$state)
+    dfm_dict1 <- dfm_subset(dfm_dict1, !(state %in% names(state_tbl)[state_tbl != 2]))
     d1 <- dfm_subset(dfm_dict1, region == "west" & year > 2018)
     d2 <- dfm_subset(dfm_dict1, region == "west" & year <= 2018)
     set.seed(100)
@@ -268,10 +272,11 @@ wordcloud_east_west_diffs_subdicts <- function(max_words) {
                     color = "cornflowerblue"
     )
     title(main = "Anti-elite antagonism in West-Germany: differences to the election before")
+    par(mar = c(5.1, 4.1, 4.1, 2.1))
 }
 
 
-wordcloud_unique_words_subdicts(48)
+wordcloud_unique_words_subdicts(56)
 
 plot_dist_grouped_subdicts()
 
