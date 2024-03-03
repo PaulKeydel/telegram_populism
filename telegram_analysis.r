@@ -119,7 +119,7 @@ wordcloud_react_rate <- function(max_words) {
                     rotation = 0.25,
                     color = RColorBrewer::brewer.pal(8, "Dark2")
     )
-    title(main = "Telegram: wordcloud of most feedbacked messages")
+    title(main = "Telegram: wordcloud of most feedbacked messages", line = -2)
 }
 
 #wordclouds between east and west
