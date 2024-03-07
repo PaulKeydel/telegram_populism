@@ -42,7 +42,8 @@
 % 1 %
 %%%%%
 \chapter{Introduction}
-The aim of this thesis is to bla bla
+The aim of this thesis is to bla bla\\
+All data files as well as all written scripts can be found on Github.\footnote{see \url{https://github.com/PaulKeydel/telegram_populism}}
 %%%%%
 % 2 %
 %%%%%
@@ -94,7 +95,8 @@ To sum up, the Telegram analysis in part is coincident with our theory. The AfD 
 In addition to the spatial dimension, we should finally consider the temporal dimension. The Telegram analysis with its restricted timescale neglects temporal aspects almost completely although, in historical terms, political thought, ideology and democracy continuously changed over time. Compared to the spatial dimension, it is probably the most relevant axis and we should include this axis not least because it allows us to analyze regional differences time-dependently. In this context, we immediately derive a benefit from the manifestos because they already contain the time dimension. As periodic and programmatic pictures they might help us to comprehend the ideological (re-)positionings of the AfD party. Putting all this together, I propose an analysis based on the last two federal state elections and the associated AfD manifestos which allows us to consider ten years of the party's history in each federal state.
 \section{Towards an analysis of the party manifestos}
 On the journey towards an analysis of the AfD manifestos at the level of the federal states, there is one last open question: How can one measure ideological antagonisms? This thesis first of all proposes a quantitative research design based on so-called dictionaries. As the term suggests it is a predefined list of words to a specific category. Within the textual data, the occurrence of all those words is then counted to see how significant the corresponding category is. Such a dictionary-based analysis can easily be implemented in software and is widely used as an alternative to qualitative content analysis.\par
-For demonstration purposes, this section first refers to an approach from Rooduijn and Pauwels measuring populism by use of a relatively simple dictionary.
+For demonstration purposes, this section first refers to an approach from Rooduijn and Pauwels measuring populism by use of a relatively simple dictionary. \citep{rooduijn:2011} With a manually coded dictionary, they compare the quantity of populist keywords between both left-wing and right-wing parties from the United Kingdom, the Netherlands, Germany and Italy. Although the dictionary only consists of a few stems they achieve good results. Their performed cross-check with a classical content analysis shows that the dictionary-based approach can measure populism between cases and over time only slightly more inexact than the qualitative method. The mismatch of accuracy is most likely reducible to the underdetermination of the manually generated dictionary. \cite[p.~1279]{rooduijn:2011}\par
+It becomes clear that the terminological composition of the dictionary is the crucial factor in obtaining reliable measurements. Thus, modern dictionaries are increasingly being trained using computerized and statistical methods. The underlying idea behind this is to progressively add contextual words to the dictionary starting from a manually collected set of conclusive keywords. For example, one can build an iterative refinement of the dictionary based on neighboring words: that is, add all words occurring most frequently within the sentences that contain keywords from the previous iteration. For the analysis of the AfD manifestos, fortunately, we can draw on such an iteratively generated dictionary constructed by Cornelius Puschmann. \citep{puschmann:2022} The so-called {\em RPC-Lex} (RPC stands for right-wing populist and conspiracy discourse) was trained on a wide range of textual data including, among others, central books and media of the German far-right movement: {\em The Protocols of the Elders of Zion}, Compact-Magazin, KenFM, Alex Jones, Daniele Ganser, Eva Herman. \cite[p.~1153]{puschmann:2022} Moreover, the authors generated multiple sub-dictionaries within the {\em RPC-Lex} to detect different aspects of the German right-wing conspiracy discourse.
 %%%%%
 % 4 %
 %%%%%
@@ -140,7 +142,6 @@ For demonstration purposes, this section first refers to an approach from Roodui
     \hline
 \end{tabular}\end{center}\end{table}
 Limit the analysis to the four subdicts from RPC. Why are these antagonisms relevant to the question in section 3.1.?\\
-What is the RPC-Lex and what is it used for? How was it constructed/collected?\\
 Which manifestos had specifically been chosen for this analysis, and why?\\
 Is there other current research that uses AfD manifestos? UK comparison, etc...\\
 Cite quanteda!
