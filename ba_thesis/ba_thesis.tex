@@ -103,8 +103,12 @@ For the analysis of the AfD manifestos, fortunately, we can draw on such an iter
 %%%%%
 \chapter{An analysis of antagonisms within AfD manifestos}
 \section{A dictionary-based approach with \em RPC-Lex}
+This chapter is going to demonstrate a possible empirical approach to examine regional differences between dichotomous {\em us} versus {\em them} constructions within the 16 AfD state associations. The central points are the generated narratives of enmity within the party‘s programmatic discourse from which we can infer a different ideological positioning. According to evaluations of scientists and journalists, it is most likely the influence of the party-internal extremist wing that might be responsible for regionally dependent differences and, under that assumption, the antagonistic articulation should differ mainly in the usage of racist and anti-immigration terms.\par
+The analysis is in sum based on 30 manifestos from the last and second last state elections, i.e. the data corpus covers the programmatic development of the AfD party from 2014 to 2023. A precise overview of available AfD manifestos can be found in table \ref{tab:tab1}. All listed manifestos were either taken from official party websites or from the nonpartisan organization {\em Abgeordnetenwatch}. In preparation for the proposed content analysis, the manifestos had to be converted from pdf file format to plain text which was realized by employing the {\em PyPDF2} library for Python. The resulting text corpus was then analyzed in terms of far-right antagonisms given by the {\em RPC-Lex} dictionary from Puschmann et al. As the previous section already pointed out, the authors developed four sub-dictionaries that can detect anti-elite, anti-immigrant/islamophobic, anti-gender and antisemitic language. We have also pointed out that especially the antagonisms against the elite, the immigrants and the Jewish community are the main enmities of populist far-right parties and potential ideology-induced language differences should primarily be revealed within these three categories. Nonetheless, we additionally included the anti-gender category in the analysis because far-right parties quite often return to traditional gender role models and express their resentments towards feminist and socially progressive movements. In this sense, feminist models of gender and family are just as little part of {\em the people}.\par
+On the technical side, the quantitative analysis is mainly built on the {\em quanteda} package for R, offering various functionalities for managing and analyzing text. \citep{quanteda} Furthermore, the {\em quanteda} package provides a simple framework for handling and applying dictionaries. It counts the number of keyword matches and calculates relative shares of each dictionary category, respectively.
 \begin{table}\begin{center}
 \caption{Available (X) AfD manifestos}
+\label{tab:tab1}
 \begin{tabular}{c c c c} 
     \hline
     state & region & second last election & last election \\ [0.5ex]
@@ -142,15 +146,6 @@ For the analysis of the AfD manifestos, fortunately, we can draw on such an iter
     \multirow{2}{*}{Thuringia [TH]} & \multirow{2}{*}{East} & 2014 & 2019 \\ && (X) & (X) \\
     \hline
 \end{tabular}\end{center}\end{table}
-Limit the analysis to the four subdicts from RPC. Why are these antagonisms relevant to the question in section 3.1.?\\
-Which manifestos had specifically been chosen for this analysis, and why?\\
-Is there other current research that uses AfD manifestos? UK comparison, etc...\\
-Cite quanteda!
-\begin{figure}
-    \centering
-    \includegraphics[width=0.75\textwidth]{manifestos_wordcloud_disjoint_subdicts-crop.pdf}
-    \caption{a nice plot}
-\end{figure}
 \section{Results for the last two state elections}
 \begin{figure}
     \centering
@@ -187,6 +182,11 @@ Cite quanteda!
 % 5 %
 %%%%%
 \chapter{Evaluation of the findings and validation}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\textwidth]{manifestos_wordcloud_disjoint_subdicts-crop.pdf}
+    \caption{a nice plot}
+\end{figure}
 \begin{figure}
     \centering
     \begin{minipage}{.5\textwidth}
