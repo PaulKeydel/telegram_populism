@@ -85,7 +85,7 @@ Taking this into account, it becomes clear that the ideology of far-right partie
 \section{Ideological antagonisms and discoursive differences between federal states}
 Like almost all German parties, the populist radical right AfD party is organized in state associations (``Landesverbände''), i.e. the party is independently represented in each of the 16 federal states in Germany. And, because ideologically induced antagonisms and prejudices can both regionally and temporally be produced, the level of the federal states is a helpful framework to identify possible differences. On this state's level, one can further argue that there are at least two strong indicators for a non-homogeneous radical right populism of the AfD party. First, between 2021 and 2023 the German national intelligence service {\em Verfassungsschutz} categorized the AfD party in three federal states (Thuringia, Saxony and Saxony-Anhalt) as anti-constitutional and right-wing extremist.\footnote{see \url{https://www.tagesschau.de/inland/innenpolitik/verfassungsschutz-afd-sachsen-rechtsextremistisch-100.html}} This clearly shows that mainly East-German AfD state associations above average tend to extremist positions which is also assumed by some political theorists. For example, Pfahl-Traughber argues that the party's extremist wing (called ``der Flügel'' and concentrated around the powerful leader {\em Björn Höcke}) is with a view to party conferences less dominant in West Germany. \cite[p.~37]{pfahl:2019} Thus, for the study of ideological heterogeneity, the federal states seem to be appropriate units of analysis and in terms of the antagonistic constitution of {\em the people} we should most likely expect differences between East and West Germany.\par
 To figure out these differences one might again take social media communication into account. In the following, I want to present an approach using party-owned and public Telegram channels from different AfD state associations. All these regional channels serve as a news service, i.e. messages only come from the AfD party. The data consists of a total of 1138 messages scraped between November 2023 and February 2024 from the country-wide channel of the party and from 8 channels on state-level: Thuringia, Saxony, Brandenburg, Bavaria, North Rhine-Westphalia, Rhineland-Palatinate, Saarland and Schleswig-Holstein. The analysis of the collected messages leads to two findings: First, many messages are just internal announcements and contain barely anything about ideological positions. Second, the political content of all other messages is surprisingly very similar, no matter what region is being considered. The majority of those messages refer to everyday news but the language itself is rather simple and regionally unspecified. As a consequence, a short-run analysis of the party's official Telegram communication is not the approach of choice if one is interested in ideological differences. Nevertheless, the data is helpful to get at least a first impression of relevant antagonisms that are used within the discourse. For this purpose, one can consider only messages that have received feedback from channel members (feedback means to assign an emoji to a message) in order to get rid of irrelevant messages. Then, within the remaining messages, we look for the most frequent words and illustrate them as a word cloud, the larger the font size the more frequent the word. (see Fig. \ref{fig:fig1}). It turns out that the Telegram communication clearly shows a set of nativist and populist keywords. For example, keywords like {\em Remigration, Migranten, Deutschland} are signifiers for a nationalist and nativist worldview, whereas words like {\em Altparteien, Ampel-Regierung, Volk, Bauern} indicate the populist dimension.\par
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{telegram_wc_most_feedbacked-crop.pdf}
     \caption{Recent communication on Telegram}
@@ -147,16 +147,27 @@ On the technical side, the quantitative analysis is mainly built on the {\em qua
     \hline
 \end{tabular}\end{center}\end{table}
 \section{Results for the last two state elections}
-\begin{figure}
+Once all preprocessing steps are done it is possible to apply the {\em RPC-Lex} to the corpus consisting of all available AfD manifestos. Since the dictionary is grouped into three main categories (antagonisms, style, topoi), we can initially analyze the corpus from that general perspective. As figure \ref{fig:fig2} shows, antagonistic content only represents approximately one-ninth of the whole programmatic discourse. The biggest amount of words within the corpus, approximately two-thirds, could not be classified by the {\em RPC-Lex}. However, this is not surprising. An arbitrary text corpus generally contains thousands of different words: stopwords, insignificant adjectives or verbs, numbers, hyperlinks, etc. On the other side, the sub-dictionaries for anti-immigrant and anti-elite language contain only about 1500 words each, the other two sub-dictionaries for both anti-gender and antisemitic language even less. But it is still an interesting result that all three main categories have approximately the same number of matching words.\par
+\begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{manifestos_dict_states_2013.pdf}
-    \caption{a nice plot}
+    \includegraphics[width=0.7\textwidth]{manifestos_grouped_dict-crop.pdf}
+    \caption{Relative shares of main categories within the entire corpus}
+    \label{fig:fig2}
 \end{figure}
-\begin{figure}
+We now want to restrict ourselves to pure antagonistic language. The goal is to split the corpus into both election periods and determine the distribution of the four ideology-related antagonisms within each period. According to table \ref{tab:tab1}, the first period ranges from 2014 to 2018 and the second period from 2019 to 2023. It is important to note that we ensure comparability between both periods, i.e. we need to normalize the distribution of the sub-dictionaries in each federal state. That means nothing else than requiring that the relative shares of the four sub-dictionaries in sum equals 1 in each federal state. The results are presented in figure \ref{fig:fig3} and \ref{fig:fig4}.\par
+\begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{manifestos_dict_states_2018.pdf}
-    \caption{a nice plot}
+    \includegraphics[width=\textwidth]{manifestos_dict_states_2013-crop.pdf}
+    \caption{Relative shares of antagonism categories from 2014 to 2018}
+    \label{fig:fig3}
 \end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{manifestos_dict_states_2018-crop.pdf}
+    \caption{Relative shares of antagonism categories from 2019 to 2023}
+    \label{fig:fig4}
+\end{figure}
+Both figures clearly show a dominance of an antagonistic articulation against the elite and immigrants regardless of space and time.
 \section{Temporal changes between East and West Germany}
 \begin{figure}
     \centering
