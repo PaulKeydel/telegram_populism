@@ -135,7 +135,7 @@ wordcloud_unique_words_subdicts <- function(min_count) {
 #plot distribution of grouped dictionary
 plot_dist_grouped_subdicts <- function() {
     dfmat <- corp_tkns |>
-        tokens_lookup(dictionary = rpc_dict_grouped) |>
+        tokens_lookup(dictionary = rpc_dict_grouped, nomatch = "uncategorized") |>
         dfm(tolower = TRUE) |>
         dfm_remove(pattern = stopwords("german"))
     fstat <- textstat_frequency(dfmat)
@@ -143,8 +143,8 @@ plot_dist_grouped_subdicts <- function() {
     bp <- barplot(height = fstat$frequency / total,
             names.arg = fstat$feature,
             ylim = c(0, 1),
-            main = "manifestos: application of grouped dictionary",
-            col = RColorBrewer::brewer.pal(3, "Blues")
+            main = "RPC-Lex: Distribution of the main categories",
+            col = RColorBrewer::brewer.pal(4, "Blues")
     )
     text(bp, fstat$frequency / total + 0.1, paste0(round(100 * fstat$frequency / total, 2), "%"), cex = 1)
 }
@@ -164,8 +164,8 @@ plot_dist_subdicts_per_state <- function() {
         col = RColorBrewer::brewer.pal(4, "Blues"),
         legend.text = rownames(dist_13_18),
         names.arg = paste0(docnames(dfmat_13_18), docvars(dfmat_13_18, "year") %% 100),
-        ylim = c(0, 1),
-        main = "dictionary performed by state: manifestos 2013 - 2018",
+        ylim = c(0, 0.8),
+        main = "Antagonisms by federal state: manifestos 2014 - 2018",
         beside = TRUE
     )
     dfmat_18_23 <- dfm_subset(dfmat_0, year > 2018) |>
@@ -178,8 +178,8 @@ plot_dist_subdicts_per_state <- function() {
         legend.text = rownames(dist_18_23),
         names.arg = paste0(docnames(dfmat_18_23), docvars(dfmat_18_23, "year") %% 100),
         cex.names = 0.82,
-        ylim = c(0, 1),
-        main = "dictionary performed by state: manifestos 2018 - 2023",
+        ylim = c(0, 0.8),
+        main = "Antagonisms by federal state: manifestos 2019 - 2023",
         beside = TRUE
     )
     #plot temporal differences
