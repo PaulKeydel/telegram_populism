@@ -173,13 +173,13 @@ As mentioned before, both election periods allow us to take the time dimension i
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{manifestos_dict_states_diffs.pdf}
-    \caption{a nice plot}
+    \caption{Percentage change between election periods}
     \label{fig:fig5}
 \end{figure}
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{manifestos_diffs_pca.pdf}
-    \caption{a nice plot}
+    \caption{Pricipal component analysis}
     \label{fig:fig6}
 \end{figure}
 However, the resulting barplot is less intuitive for recognizing regional patterns within the ideological change. We thus aim for better visualization and apply a principal component analysis (PCA) to the 14 antagonism differences. Mathematically this is equivalent to a dimensionality reduction, i.e. we project all four-dimensional data points onto a two-dimensional subspace spanned by those two vectors that indicate the most significant direction of change.\footnote{In computational terms, the desired plane is the result of a singular value decomposition of the $14\times 4$ data matrix. The eigenvectors corresponding to the two greatest eigenvalues are used to span the plane.} In other words, the four values specifying one single difference can easily be visualized by a point in the plane (see Fig. \ref{fig:fig6}). Compared to the older manifestos we truly see that the AfD party in Thuringia, Brandenburg, Saxony and Saxony-Anhalt intensified anti-immigrant enmities. Because the sole East-German exception is Mecklenburg-Vorpommern we can conclude that the AfD party in East Germany changed from anti-elitist attitudes to more racist narratives. More or less the opposite can be observed for the majority of West-German AfD associations: Here the party reinforced narratives against the democratic and economic elite. This outcome is interesting inasmuch as it shows a clear distinction between East and West Germany in terms of the party's ideological development, which was already supposed before. Another interesting observation is that the AfD party in Berlin shows almost no temporal changes, which indeed supports the argumentation of a pure East-West gradient.\par
@@ -188,13 +188,13 @@ The temporal analysis of the manifestos can be summed up in saying that East-Ger
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{manifestos_temporal_regression_west.pdf}
-    \caption{a nice plot}
+    \caption{Linear regressions over time in West Germany}
     \label{fig:fig7}
 \end{figure}
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{manifestos_temporal_regression_east.pdf}
-    \caption{a nice plot}
+    \caption{Linear regressions over time in East Germany}
     \label{fig:fig8}
 \end{figure}
 %%%%%
