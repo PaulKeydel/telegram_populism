@@ -2,7 +2,7 @@
 \documentclass[a4paper]{scrreprt}
 %package for citing in Harvard style
 \usepackage{natbib}
-\bibliographystyle{agsm}
+\bibliographystyle{agsm_paul}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[none]{hyphenat}
@@ -109,7 +109,7 @@ On the technical side, the quantitative analysis is mainly built on the {\em qua
 \begin{table}\begin{center}
 \caption{Available (X) AfD manifestos}
 \label{tab:tab1}
-\begin{tabular}{c c c c} 
+\begin{tabular}{c c c c}
     \hline
     state & region & second last election & last election \\ [0.5ex]
     \hline\hline
@@ -169,6 +169,7 @@ We now want to restrict ourselves to pure antagonistic language. The goal is to 
 \end{figure}
 Both figures clearly show a dominance of an antagonistic articulation against the elite and immigrants regardless of time and region, which is also in line with the party's communication on Telegram investigated earlier. Almost all manifestos within the corpus are primarily characterized by an anti-elitist language, followed by a strong influence of anti-immigrant language. In combination, both kinds of antagonisms affect over 80\% of the programmatic discourse whereas anti-gender attitudes and mainly antisemitism play a rather marginal role. This repetitive pattern clarifies that the AfD party has been a populist far-right party from its beginning. And even though there might have been developments in a more extremist direction, the data can show that racist enmities have always been one of the ideological core elements besides the strong appeal to {\em the people}. In other words, social othering and narratives against democratic institutions are two integral parts of separating {\em them} from {\em us}. However, considering each single election period, regional differences in themselves are hard to identify because the distributions are just too similar. Even between East and West Germany, there are no obvious differences except that the AfD party in West German city-states has sometimes more prejudices against immigrants than against the elite (Bremen and Hamburg). All in all, one barely finds generalizable differences by looking separately at the two election periods and it is maybe more convincing to consider the temporal changes which we will do in the next section.
 \section{Temporal changes between East and West Germany}
+As mentioned before, both election periods allow us to take the time dimension into account and a full observation of the party‘s history becomes possible. Due to the continuous change of political thought and political discourses, we can be hopeful to see more regional differences if one compares the manifestos temporally, with a five-year distance according to the election rules in the federal states: How has a single AfD state association changed its ideological prejudices within one legislative period? Referring back to the results of the previous section, the change of antagonistic discourses can simply be calculated by subtracting the relative shares of a specific antagonism between the two moments in time. The development from the oldest manifesto to the newest is shown in Figure 4.4 (note that Rhineland-Palatinate and Saarland had to be excluded due to the missing manifestos).\par
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{manifestos_dict_states_diffs.pdf}
@@ -181,6 +182,8 @@ Both figures clearly show a dominance of an antagonistic articulation against th
     \caption{a nice plot}
     \label{fig:fig6}
 \end{figure}
+However, the resulting barplot is less intuitive for recognizing regional patterns within the ideological change. We thus aim for better visualization and apply a principal component analysis (PCA) to the 14 antagonism differences. Mathematically this means, that we project all four-dimensional tuples onto a two-dimensional subspace spanned by those two vectors that represent the most significant direction of change.\footnote{In computational terms, the desired plane is the result of a singular value decomposition of the $14\times 4$ data matrix. The eigenvectors corresponding to the two greatest eigenvalues are used to span the plane.} This new visualization of the ideological change is illustrated in Figure \ref{fig:fig6}. Compared to the older manifestos we now see that the AfD party in Thuringia, Brandenburg, Saxony and Saxony-Anhalt intensified anti-immigrant enmities. Because the sole East-German exception is Mecklenburg-Vorpommern we can conclude that the AfD party in East Germany changed from anti-elitist attitudes to more racist narratives. More or less the opposite can be observed for the majority of West-German AfD associations: Here the party reinforced narratives against the democratic and economic elite. This outcome is interesting inasmuch as it shows a clear distinction between East and West Germany regarding the party's ideological development that was already supposed before. Another interesting observation is that the AfD party in Berlin shows almost no temporal changes, which indeed supports the argumentation of a pure East-West gradient.\par
+With this in mind, we can proceed to analyze the ideological development in East and West Germany independently of each other. By doing some linear regression over time we might get more information on how the party modified its antagonistic articulation in both regions (without Berlin). For this, we consider the relative shares of one antagonism category and plot them by the years of the elections. This approach might demonstrate how the usage of each antagonism has changed over time, in East Germany as well as in West Germany. Figure \ref{fig:fig7} at first shows the situation in West Germany and as the principal component analysis already suggested, we can prove an increasing anti-elitist discourse whereas the anti-immigrant articulation decreases at the same time. While the language against immigrants and the elite is strongly affected in terms of temporal change, the less dominant antisemitic and anti-gender language nearly remains constant over time. Furthermore, according to East Germany and figure \ref{fig:fig8}, the language has successively shifted to more racist and less populist narratives while antisemitic and anti-gender elements have not changed, either.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{manifestos_temporal_regression_west.pdf}
