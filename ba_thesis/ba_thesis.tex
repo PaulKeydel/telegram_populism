@@ -201,24 +201,27 @@ The temporal analysis of the manifestos can be summed up in saying that East-Ger
 % 5 %
 %%%%%
 \chapter{Evaluation of the findings}
+Each dictionary-based content analysis has one central bottleneck: the dictionary in itself. The methodological quality of the whole analysis depends heavily on the quality of the dictionary and its keyword lists. Thus, this chapter will evaluate all present findings by taking a renewed look at the {\em RPC-Lex}. Particularly because the {\em RPC-Lex} as a computerized generated dictionary might contain words only for statistical reasons, it is advisable to validate the provided classifications. In the following, I will elaborate on two aspects of validation that is, the classification accuracy of the dictionary and the reliability of measurements.\par
+According to the classification accuracy, the question is which keywords from the dictionary are the unique classifiers related to the own corpus? Is the pre-trained dictionary anyway able to reasonably classify the corpus? In our case, the answer is yes (not least because the authors have extensively tested the dictionary). Especially the classification of anti-elitist and anti-immigrant content seems to be satisfying. Figure \ref{fig:fig9} lists a selection of unique classifiers and one can see that both mentioned categories have the most. However, the classification of antisemitic antagonisms is only based on a few keywords and, thus, must be evaluated critically. Here not only the small number of words is the problem but also the insignificance of the available classifiers (e.g. ``zeigt'', ``beste''). Consequently, the classification of antisemitic language is most likely less accurate than for the other antagonisms.\par
 \begin{figure}
     \centering
     \includegraphics[width=0.75\textwidth]{manifestos_wordcloud_disjoint_subdicts-crop.pdf}
-    \caption{a nice plot}
+    \caption{Unique classifiers for all antagonism categories}
     \label{fig:fig9}
 \end{figure}
+The second aspect refers to the intensified anti-immigrant discourse in East Germany and the intensified anti-elite discourse in West Germany, respectively. To validate these findings we want to figure out which keywords from the {\em RPC-Lex} have caused the growth between the two election periods. This implies that we need to determine all those keywords being predominantly present in the last manifestos but not in the manifestos before. The resulting word clouds can be found in Fig. \ref{fig:fig10} and Fig. \ref{fig:fig11}. As one can see, the increasing number of anti-elitist antagonisms within West-German AfD manifestos can be traced back to keywords indicating a clear nationalist and populist position (e.g. ``unserer'', ``unser'', ``Bürger'', ``Deutschland'', ``EU''). In this sense the increase within the anti-elitist language is plausible. For the anti-immigrant discourse in East Germany, however, the rising number of racist terms is difficult to validate. The growth rate is mainly caused by keywords like ``Land'', ``Schutz'', ``Heimat'', ``Schulen'', ``Geld'' which do not directly relate to a racist discourse. Such terms can admittedly be used in racist statements but, as single signifiers, they are rather inappropriate for validating the results. At this point, more effort is necessary to be able to emphasize the racist tendencies in East-German AfD manifestos. 
 \begin{figure}
     \centering
     \begin{minipage}{.5\textwidth}
         \centering
         \includegraphics[width=0.85\textwidth]{manifestos_wordcloud_diffs_west-crop.pdf}
-        \caption{a nice plot}
+        \caption{Rising anti-elite terms}
         \label{fig:fig10}
     \end{minipage}%
     \begin{minipage}{.5\textwidth}
         \centering
         \includegraphics[width=\textwidth]{manifestos_wordcloud_diffs_east-crop.pdf}
-        \caption{a nice plot}
+        \caption{Rising anti-immigration terms}
         \label{fig:fig11}
     \end{minipage}
 \end{figure}
