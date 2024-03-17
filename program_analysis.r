@@ -235,7 +235,8 @@ temporal_plot_subdicts <- function(geo_region = "") {
     ggplot(data = t, aes(x = year,  y = percentage, color = antagonism)) +
         geom_point() +
         geom_smooth(method = "lm", se = FALSE) +
-        ggtitle(paste("Temporal analysis: AfD manifestos in", ifelse(geo_region == "ost", "East-Germany", "West-Germany")))
+        ggtitle(paste("Temporal analysis: AfD manifestos in", ifelse(geo_region == "ost", "East-Germany", "West-Germany"))) +
+        scale_y_continuous(labels = scales::percent)
 }
 
 #wordclouds of temporal differences in specific subdicts
