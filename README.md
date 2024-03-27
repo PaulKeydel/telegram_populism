@@ -3,5 +3,6 @@ Based on a dictionary (RPC-Lex, Cornelius Puschmann et al.), the project wants t
 * the Python script for scraping from Telegram
 * the Python script to convert manifestos from pdf to plain text
 * the Python script for scraping from websites (right-wing movements)
+* the Telegram corpus and the manifesto corpus as *.tsv files
 * the R scripts for data analysis, for Telegram and the manifestos
 * my BA thesis as LaTeX project
