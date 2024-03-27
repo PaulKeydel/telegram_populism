@@ -7,6 +7,7 @@ library("quanteda.textstats")
 library("dplyr")
 library("tidyr")
 library("readr")
+library("ggplot2")
 
 #working directory
 data_dir <- "/Users/paulkeydel/Documents/coding projects/telegram/"
@@ -207,6 +208,31 @@ plot_dist_defined_subdicts <- function() {
     )
 }
 
+#plot average usage of each subdict over Telegram channels
+plot_avg_usage_subdicts <- function() {
+    dfmat <- corp_tkns |>
+        tokens_lookup(dictionary = rpc_dict) |>
+        dfm(tolower = TRUE) |>
+        dfm_remove(pattern = stopwords("german")) |>
+        dfm_weight(scheme = "prop")
+    t <- convert(dfmat, to = "data.frame")
+    t <- cbind(state = docvars(dfmat, "state"), t)
+    t <- select(t, -doc_id) %>%
+        group_by(state) %>%
+        summarise(`anti-elitism` = mean(`anti-elitism`),
+                  `anti-gender/anti-feminism` = mean(`anti-gender/anti-feminism`),
+                  `anti-immigration/islamophobia` = mean(`anti-immigration/islamophobia`),
+                  `antisemitism` = mean(`antisemitism`))
+    t <- gather(t, "antagonism", "percentage", -state)
+    mean_table <- select(t, -state) %>% group_by(antagonism) %>% summarise(m = mean(percentage))
+    ggplot(data = t, aes(x = state,  y = percentage, color = antagonism)) +
+        geom_point() +
+        geom_hline(data = mean_table, aes(yintercept = m, col = antagonism), linetype = "dashed") +
+        ggtitle("Telegram: Average usage of antagonisms") +
+        xlab("Telegram channel") +
+        scale_y_continuous(labels = scales::percent)
+}
+
 
 #number of collected messages in east, west, federal
 rawdata %>% group_by(region) %>% summarise(n = n(), r = n() / nrow(rawdata))
@@ -220,3 +246,5 @@ wordcloud_east_west(60)
 plot_dist_grouped_subdicts()
 
 plot_dist_defined_subdicts()
+
+plot_avg_usage_subdicts()
